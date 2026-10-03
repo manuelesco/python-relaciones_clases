@@ -1,0 +1,2800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Interactivo - Relaciones entre Clases en Python</title>
+	
+	<!-- Tabler Icons — siempre antes de tu CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
+  
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --python-blue: #306998; --python-blue-light: #4B8BBE; --python-blue-dark: #265577;
+            --python-yellow: #FFD43B; --python-yellow-light: #FFE873; --python-yellow-dark: #E5BE01;
+            --bg-dark: #1a1a2e; --bg-card: #16213e; --bg-code: #0f0f23;
+            --text-light: #e0e0e0; --text-muted: #a0a0b8;
+            --success: #4caf50; --error: #f44336; --warning: #ff9800;
+            --border-radius: 12px; --shadow: 0 8px 32px rgba(0,0,0,0.3);
+			--color-rojo: red;
+			--color-blanco: white;
+			--color-green: green;
+        }
+		p {
+			text-align: justify;
+		}
+		
+		.text-center { text-align: center; }
+		
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.7; min-height: 100vh; }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--python-blue); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--python-blue-light); }
+
+        header { background: linear-gradient(135deg, var(--python-blue-dark) 0%, var(--python-blue) 50%, var(--python-yellow-dark) 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
+        header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,212,59,0.1) 0%, transparent 60%); animation: pulse 8s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+        .logo-container { display: inline-flex; align-items: center; gap: 15px; margin-bottom: 20px; position: relative; z-index: 1; }
+        .python-logo-svg { width: 100px; height: 100px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
+        header h1 { font-size: 2.5em; font-weight: 800; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); position: relative; z-index: 1; }
+        header h1 span.blue { color: var(--python-yellow); }
+        header h1 span.yellow { color: var(--python-blue-light); }
+        header p { font-size: 1.2em; color: rgba(255,255,255,0.85); margin-top: 10px; position: relative; z-index: 1; }
+
+        nav { background: var(--bg-card); padding: 15px 20px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-bottom: 2px solid var(--python-blue); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; }
+        .nav-btn { background: transparent; color: var(--text-light); border: 1px solid rgba(48,105,152,0.4); padding: 7px 13px; border-radius: 25px; cursor: pointer; font-size: 0.8em; transition: all 0.3s ease; white-space: nowrap; }
+        .nav-btn:hover, .nav-btn.active { background: var(--python-blue); border-color: var(--python-yellow); color: var(--python-yellow); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(48,105,152,0.4); }
+        .progress-bar { width: 100%; max-width: 1200px; margin: 10px auto 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--python-blue), var(--python-yellow)); width: 0%; transition: width 0.5s ease; border-radius: 2px; }
+        .progress-text { text-align: center; font-size: 0.75em; color: var(--text-muted); margin-top: 4px; }
+
+        main { max-width: 900px; margin: 0 auto; padding: 30px 20px 60px; }
+        .section { display: none; animation: fadeIn 0.5s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section-title { font-size: 2em; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .section-title .icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--python-blue), var(--python-yellow)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3em; flex-shrink: 0; }
+        .section-subtitle { color: var(--text-muted); font-size: 1.1em; margin-bottom: 30px; padding-left: 57px; }
+
+        .card { background: var(--bg-card); border-radius: var(--border-radius); padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow); border: 1px solid rgba(48,105,152,0.2); transition: transform 0.3s ease, border-color 0.3s ease; }
+        .card:hover { border-color: rgba(255,212,59,0.3); }
+        .card h3 { color: var(--python-yellow); font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+		.card h3.sub{ color: var(--python-blue); font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .card p, .card li { color: var(--text-muted); margin-bottom: 8px; }
+        .card ul { padding-left: 20px; }
+        .card ul li { margin-bottom: 5px; }
+        .highlight { color: var(--python-yellow); font-weight: 600; }
+		.warning { color: var(--color-rojo); font-weight: 600; }
+		.numpy { color: rgb(77, 119, 207); font-weight: 600; }
+
+        .code-block { background: var(--bg-code); border-radius: 10px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(48,105,152,0.3); }
+        .code-header { background: rgba(48,105,152,0.3); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .code-header span { font-size: 0.8em; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f56; }
+        .code-dots span:nth-child(2) { background: #ffbd2e; }
+        .code-dots span:nth-child(3) { background: #27c93f; }
+        .code-body { padding: 15px 20px; overflow-x: auto; }
+        .code-body pre { margin: 0; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.8; }
+        .kw { color: #c792ea; font-weight: bold; }
+        .fn { color: #82aaff; }
+        .st { color: #c3e88d; }
+        .cm { color: #546e7a; font-style: italic; }
+        .nb { color: #89ddff; }
+        .num { color: #f78c6c; }
+        .op { color: #89ddff; }
+        .var { color: #ffcb6b; }
+        .bool { color: #ff5370; font-weight: bold; }
+        .indent { display: inline-block; width: 4ch; }
+
+        .output-block { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 8px; padding: 12px 18px; margin-top: 10px; font-family: 'Consolas', monospace; font-size: 0.9em; color: var(--success); }
+        .output-block .output-label { font-size: 0.75em; color: var(--success); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 600; }
+
+        .demo-container { background: linear-gradient(135deg, rgba(48,105,152,0.15), rgba(255,212,59,0.05)); border: 2px solid var(--python-blue); border-radius: var(--border-radius); padding: 25px; margin: 25px 0; }
+        .demo-title { color: var(--python-yellow); font-size: 1.1em; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .demo-input-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .demo-input-group label { font-size: 0.9em; color: var(--text-muted); min-width: 120px; }
+        .demo-input { background: var(--bg-code); border: 1px solid rgba(48,105,152,0.4); color: var(--text-light); padding: 10px 15px; border-radius: 8px; font-size: 0.95em; font-family: 'Consolas', monospace; outline: none; transition: border-color 0.3s; min-width: 150px; }
+        .demo-input:focus { border-color: var(--python-yellow); box-shadow: 0 0 10px rgba(255,212,59,0.2); }
+        .demo-select { background: var(--bg-code); border: 1px solid rgba(48,105,152,0.4); color: var(--text-light); padding: 10px 15px; border-radius: 8px; font-size: 0.95em; outline: none; cursor: pointer; min-width: 150px; }
+        .demo-select:focus { border-color: var(--python-yellow); }
+        .demo-select option { background: var(--bg-code); color: var(--text-light); }
+        .run-btn { background: linear-gradient(135deg, var(--python-blue), var(--python-blue-light)); color: #fff; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .run-btn:hover { background: linear-gradient(135deg, var(--python-yellow-dark), var(--python-yellow)); color: var(--bg-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,212,59,0.3); }
+        .demo-output { background: var(--bg-code); border-radius: 8px; padding: 15px; margin-top: 15px; font-family: 'Consolas', monospace; font-size: 0.9em; min-height: 50px; border: 1px solid rgba(48,105,152,0.2); white-space: pre-wrap; transition: border-color 0.3s; }
+        .demo-output.has-output { border-color: var(--python-yellow); }
+
+        /* QUIZ — nuevo diseño */
+        .quiz-card { background: var(--bg-card); border: 1px solid rgba(48,105,152,0.3); border-radius: 14px; padding: 24px; margin-top: 20px; }
+        .quiz-q { font-size: 1rem; font-weight: 600; color: var(--text-light); margin-bottom: 16px; line-height: 1.5; }
+        .quiz-options { display: grid; gap: 10px; }
+        .quiz-opt { background: rgba(48,105,152,0.1); border: 2px solid rgba(48,105,152,0.3); border-radius: 10px; padding: 12px 16px; cursor: pointer; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.88rem; color: var(--text-light); text-align: left; transition: all 0.2s; }
+        .quiz-opt:hover { border-color: var(--python-blue-light); background: rgba(48,105,152,0.2); }
+        .quiz-opt.correct { border-color: var(--success); background: rgba(76,175,80,0.15); color: var(--success); }
+        .quiz-opt.wrong { border-color: var(--error); background: rgba(244,67,54,0.1); color: var(--error); }
+        .quiz-feedback { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; display: none; }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.ok { background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.3); color: var(--success); }
+        .quiz-feedback.fail { background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.3); color: var(--error); }
+        .quiz-next { margin-top: 14px; background: linear-gradient(135deg, var(--python-yellow-dark), var(--python-yellow)); color: var(--bg-dark); border: none; border-radius: 8px; padding: 10px 22px; font-weight: 700; cursor: pointer; display: none; transition: all 0.2s; font-size: 0.95em; }
+        .quiz-next.show { display: inline-block; }
+        .quiz-next:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,212,59,0.4); }
+
+        .flow-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 20px 0; padding: 20px; }
+        .flow-box { background: var(--bg-card); border: 2px solid var(--python-blue); border-radius: 10px; padding: 12px 25px; text-align: center; font-weight: 600; position: relative; min-width: 200px; }
+        .flow-box.start { border-radius: 25px; background: linear-gradient(135deg, var(--python-blue), var(--python-blue-light)); border-color: var(--python-blue-light); }
+        .flow-box.decision { border-color: var(--python-yellow); background: rgba(255,212,59,0.1); color: var(--python-yellow); border-radius: 10px; padding: 15px 25px; min-width: 200px; }
+        .flow-box.action { border-color: var(--python-blue-light); background: rgba(75,139,190,0.1); }
+        .flow-box.end { border-radius: 25px; background: linear-gradient(135deg, var(--python-yellow-dark), var(--python-yellow)); border-color: var(--python-yellow); color: var(--bg-dark); }
+        .flow-arrow { width: 2px; height: 30px; background: var(--text-muted); position: relative; }
+        .flow-arrow::after { content: '▼'; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.7em; }
+        .flow-label { font-size: 0.8em; color: var(--python-yellow); font-weight: 600; margin: 5px 0; }
+        .flow-branch { display: flex; gap: 40px; align-items: flex-start; margin: 10px 0; }
+        .flow-branch-item { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+        .comparison-table { width: 100%; min-width: 500px; border-collapse: separate; border-spacing: 0; margin: 20px auto; border-radius: 10px; overflow: hidden; border: 1px solid rgba(48,105,152,0.3); }
+        .comparison-table th { background: linear-gradient(135deg, var(--python-blue-dark), var(--python-blue)); color: var(--python-yellow); padding: 14px 18px; text-align: left; font-weight: 700; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;}	
+        .comparison-table td { background: var(--bg-card); padding: 12px 18px; border-bottom: 1px solid rgba(48,105,152,0.15); font-size: 0.9em; }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: rgba(48,105,152,0.1); }
+        .comparison-table code { background: rgba(255,212,59,0.1); color: var(--python-yellow); padding: 2px 8px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; }
+
+        .tip-box { background: rgba(255,212,59,0.08); border-left: 4px solid var(--python-yellow); border-radius: 0 10px 10px 0; padding: 18px 20px; margin: 20px 0; }
+        .tip-box .tip-title { color: var(--python-yellow); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .tip-box p { color: var(--text-muted); font-size: 0.95em; }
+        .warning-box { background: rgba(244,67,54,0.08); border-left: 4px solid var(--error); border-radius: 0 10px 10px 0; padding: 18px 20px; margin: 20px 0; }
+        <!-- .warning-box .warning-title { color: var(--error); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; } -->
+		.warning-box .warning-title { color: var(--color-rojo); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+		.warning-box p { color: #fef08a; font-size: 0.95em; }
+		.note-box { background: rgba(255,212,59,0.08); border-left: 4px solid var(--color-green); border-radius: 0 10px 10px 0; padding: 18px 20px; margin: 20px 0; }
+        .note-box .note-title { color: var(--color-green); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .note-box p { color: var(--text-muted); font-size: 0.95em; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(48,105,152,0.2); }
+        .nav-arrow-btn { background: linear-gradient(135deg, var(--python-blue), var(--python-blue-light)); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-size: 0.95em; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .nav-arrow-btn:hover { background: linear-gradient(135deg, var(--python-yellow-dark), var(--python-yellow)); color: var(--bg-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,212,59,0.3); }
+        .nav-arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .score-panel { position: fixed; bottom: 20px; right: 20px; background: var(--bg-card); border: 2px solid var(--python-yellow); border-radius: 15px; padding: 15px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); z-index: 999; min-width: 180px; }
+        .score-panel .score-label { font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .score-panel .score-value { font-size: 2em; font-weight: 800; color: var(--python-yellow); line-height: 1; }
+        .score-panel .score-total { font-size: 0.85em; color: var(--text-muted); }
+
+        footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 0.85em; border-top: 1px solid rgba(48,105,152,0.2); margin-top: 40px; }
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; } 
+			.section-title { font-size: 1.5em; } 
+			.section-subtitle { padding-left: 0; }
+            .nav-container { gap: 5px; } 
+			.nav-btn { padding: 6px 12px; font-size: 0.75em; } 
+			.code-body pre { font-size: 0.8em; }
+            .demo-input-group { flex-direction: column; align-items: stretch; } 
+			.demo-input-group label { min-width: auto; }
+            .flow-branch { flex-direction: column; gap: 15px; } 
+			.score-panel { bottom: 10px; right: 10px; padding: 10px 15px; min-width: 140px; }
+            .score-panel .score-value { font-size: 1.5em; } .python-logo-svg { width: 80px; height: 80px; }
+			.footer-logo-space img { height: 45px; }
+        }
+
+        .bounce-in { animation: bounceIn 0.6s ease; }
+        @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); opacity: 1; } }
+
+        .challenge-box { background: linear-gradient(135deg, rgba(255,152,0,0.1), rgba(244,67,54,0.05)); border: 2px solid var(--warning); border-radius: var(--border-radius); padding: 25px; margin: 25px 0; }
+        .challenge-box .challenge-title { color: var(--warning); font-size: 1.1em; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .challenge-box p { color: var(--text-muted); margin-bottom: 10px; }
+        .mini-editor { background: var(--bg-code); border-radius: 10px; border: 1px solid rgba(48,105,152,0.3); overflow: hidden; margin: 15px 0; }
+        .mini-editor-header { background: rgba(48,105,152,0.3); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .mini-editor-header span { font-size: 0.8em; color: var(--text-muted); font-weight: 600; }
+        .editor-instructions { background: rgba(255,212,59,0.06); border-bottom: 1px solid rgba(48,105,152,0.2); padding: 12px 18px; font-family: 'Consolas', monospace; font-size: 0.85em; color: var(--text-muted); line-height: 1.8; white-space: pre; user-select: text; -webkit-user-select: text; }
+        .editor-instructions .instruction-line { color: #546e7a; font-style: italic; }
+        .editor-instructions .instruction-var { color: #ffcb6b; }
+        .mini-editor textarea { width: 100%; min-height: 280px; background: transparent; border: none; color: var(--text-light); font-family: 'Consolas', monospace; font-size: 0.9em; padding: 15px; resize: vertical; outline: none; line-height: 1.8; tab-size: 4; }
+        .mini-editor textarea::placeholder { color: rgba(160,160,184,0.3); }
+        .mini-editor-footer { padding: 10px 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-top: 1px solid rgba(48,105,152,0.2); }
+        .editor-output { background: var(--bg-code); border: 1px solid rgba(48,105,152,0.2); border-radius: 8px; padding: 12px 15px; font-family: 'Consolas', monospace; font-size: 0.85em; min-height: 40px; margin-top: 10px; white-space: pre-wrap; color: var(--text-muted); }
+        .editor-output.success { border-color: rgba(76,175,80,0.4); color: var(--success); }
+        .editor-output.error { border-color: rgba(244,67,54,0.4); color: var(--error); }
+        .steps { display: flex; justify-content: center; gap: 5px; margin: 20px 0; flex-wrap: wrap; }
+        .step-dot { width: 35px; height: 35px; border-radius: 50%; background: rgba(48,105,152,0.2); border: 2px solid rgba(48,105,152,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: 700; color: var(--text-muted); transition: all 0.3s; }
+        .step-dot.completed { background: var(--python-blue); border-color: var(--python-blue-light); color: #fff; }
+        .step-dot.current { background: var(--python-yellow); border-color: var(--python-yellow); color: var(--bg-dark); transform: scale(1.2); }
+        .solution-toggle { background: none; border: 1px solid rgba(255,212,59,0.3); color: var(--python-yellow); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.85em; transition: all 0.3s ease; margin-top: 10px; }
+        .solution-toggle:hover { background: rgba(255,212,59,0.1); border-color: var(--python-yellow); }
+        .solution-content { display: none; margin-top: 10px; }
+        .solution-content.visible { display: block; }
+
+
+	
+	
+	.section-header {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 28px;
+		padding-bottom: 18px;
+		border-bottom: 1px solid var(--border);
+	}
+  
+	.section-icon {
+		width: 48px;
+		height: 48px;
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 22px;
+		flex-shrink: 0;
+	}
+
+	.icon-blue { background: rgba(48,105,152,0.25); border: 1px solid rgba(48,105,152,0.4); }
+	.icon-yellow { background: rgba(255,212,59,0.15); border: 1px solid rgba(255,212,59,0.3); }
+	.icon-green { background: rgba(63,185,80,0.15); border: 1px solid rgba(63,185,80,0.3); }
+	.icon-red { background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.3); }
+	.icon-purple { background: rgba(210,168,255,0.15); border: 1px solid rgba(210,168,255,0.3); }
+	.icon-orange { background: rgba(240,136,62,0.15); border: 1px solid rgba(240,136,62,0.3); }
+	
+	.section-header-text h2 {
+		font-size: 1.7rem;
+		font-weight: 700;
+		letter-spacing: -0.5px;
+	}
+	
+	.section-header-text p {
+		color: var(--text-dim);
+		font-size: 0.9rem;
+		margin-top: 4px;
+	}
+	
+	/* COMPARISON TABLE */
+  .cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+
+  .cmp-table th {
+    background: var(--py-blue);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .cmp-table th:first-child { border-radius: 10px 0 0 0; }
+  .cmp-table th:last-child { border-radius: 0 10px 0 0; }
+
+  .cmp-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .cmp-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .cmp-table tr:hover td { background: rgba(48,105,152,0.08); }
+  .cmp-table td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--py-yellow); font-weight: 700; }
+  
+  /* ANCHO DE LA TABLA */
+	.comparison-table.table-compact th,
+	.comparison-table.table-compact td {
+		font-size: 0.9em;
+		padding: 12px 18px;
+		white-space: nowrap;
+	}
+
+    /* SECCIÓN EXPANDIBLE */
+	.expandable-card { cursor: pointer; transition: all 0.3s ease; }
+	.expandable-card:hover { transform: translateX(5px); }
+	.expandable-card .expandable-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--python-blue); }
+	.expandable-card.expanded .expandable-details { display: block; animation: fadeIn 0.3s ease; }
+	.expandable-card h3::after { content: " ▶"; font-size: 0.8em; margin-left: auto; }
+	.expandable-card.expanded h3::after { content: " ▼"; }
+
+    /* ── Prism syntax highlighting ── */
+    .snippet-tag {
+      font-family: 'Consolas','Monaco','Courier New',monospace;
+      font-size: .72rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .tag-output { background: rgba(76,175,80,.15); color: #4caf50; }
+
+    .output-bar { border-top: 1px solid rgba(48,105,152,0.3); justify-content: flex-end; }
+
+    /* code-wrap: columna de números + bloque de código */
+    .code-wrap {
+      display: flex;
+      overflow-x: auto;
+    }
+    .line-numbers-col {
+      flex-shrink: 0;
+      background: rgba(48,105,152,0.15);
+      border-right: 1px solid rgba(48,105,152,0.3);
+      padding: 15px 12px 15px 14px;
+      font-family: 'Consolas','Monaco','Courier New',monospace;
+      font-size: 0.9em;
+      line-height: 1.8;
+      color: #445566;
+      text-align: right;
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+    }
+    .line-numbers-col span { display: block; }
+    .code-wrap pre[class*="language-"] {
+      flex: 1;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      padding: 15px 20px !important;
+      background: transparent !important;
+      font-family: 'Consolas','Monaco','Courier New',monospace !important;
+      font-size: 0.9em !important;
+      line-height: 1.8 !important;
+      overflow-x: visible;
+    }
+
+    /* Prism token overrides */
+    .token.comment,.token.prolog,.token.doctype { color: #546e7a !important; font-style: italic; }
+    .token.keyword  { color: #c792ea !important; font-weight: bold; }
+    .token.builtin  { color: #89ddff !important; }
+    .token.string,.token.char { color: #c3e88d !important; }
+    .token.number   { color: #f78c6c !important; }
+    .token.function { color: #82aaff !important; }
+    .token.class-name { color: #89ddff !important; font-weight: 600; }
+    .token.decorator,.token.at-rule { color: #4ade80 !important; }
+    .token.boolean  { color: #ff5370 !important; font-weight: bold; }
+    .token.operator { color: #89ddff !important; }
+    .token.punctuation { color: #89ddff !important; }
+
+    /* output-body (debajo de la barra de salida) */
+    .output-body {
+      background: rgba(0,0,0,0.25);
+      padding: 12px 20px;
+      font-family: 'Consolas','Monaco','Courier New',monospace;
+      font-size: 0.9em;
+      line-height: 1.8;
+    }
+	
+	.output-body pre {
+		color: #4ade80;
+	}
+    .output-line { display: block; color: var(--success); }
+    .output-line::before { content: '>>> '; color: rgba(160,160,184,0.5); user-select: none; }
+	
+	/* output-body-file (debajo de la barra de salida) */
+    .output-body-file {
+      background: #E8DFC8;
+      padding: 12px 20px;
+      font-family: 'Consolas','Monaco','Courier New',monospace;
+      font-size: 1.1em;
+      line-height: 1.8;
+    }
+	
+	.output-body-file pre {
+		color: #2E2416;
+	}
+
+    /* ── section heading ── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      margin-top: 48px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--python-yellow);
+      border-radius: 2px;
+    }
+
+
+/* ───────────────────────────────────────── */
+/* ESTILOS TIPO python_syntax_OKAS.html      */
+/* ───────────────────────────────────────── */
+
+.snippet {
+  background: var(--bg-card);
+  border: 1px solid rgba(48,105,152,0.25);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.snippet:hover {
+  border-color: rgba(255,212,59,.35);
+  box-shadow: 0 0 32px rgba(255,212,59,.06);
+}
+
+.snippet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(48,105,152,0.25);
+  gap: 12px;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+}
+
+.dots span:nth-child(1) { background: #ff5f57; }
+.dots span:nth-child(2) { background: #febc2e; }
+.dots span:nth-child(3) { background: #28c840; }
+
+.snippet-title {
+  font-family: 'Consolas','Monaco','Courier New',monospace;
+  font-size: .8rem;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: center;
+}
+
+.snippet-tag {
+  font-family: 'Consolas','Monaco','Courier New',monospace;
+  font-size: .72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.tag-fn {
+  background: rgba(92,216,247,.15);
+  color: #5cd8f7;
+}
+
+.tag-output {
+  background: rgba(74,222,128,.15);
+  color: #4ade80;
+}
+
+.tag-file {
+  background: rgba(251,146,60,.15);
+  color: #fb923c;
+}
+
+.output-bar {
+  border-top: 1px solid rgba(48,105,152,0.25);
+  justify-content: flex-end;
+}
+
+.snippet pre[class*="language-"] {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  padding: 22px 24px !important;
+  background: transparent !important;
+  font-family: 'Consolas','Monaco','Courier New',monospace !important;
+  font-size: .85rem !important;
+  line-height: 1.75 !important;
+  overflow-x: auto;
+}
+
+.output-body {
+  background: #0a0c10;
+  padding: 16px 24px;
+  font-family: 'Consolas','Monaco','Courier New',monospace;
+  font-size: .85rem;
+  line-height: 1.75;
+}
+
+.output-line {
+  display: block;
+  color: #4ade80;
+}
+
+.output-line::before {
+  content: '>>> ';
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.code-wrap {
+  display: flex;
+  overflow-x: auto;
+}
+
+.line-numbers-col {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+  border-right: 1px solid rgba(48,105,152,0.25);
+  padding: 22px 14px 22px 16px;
+  font-family: 'Consolas','Monaco','Courier New',monospace;
+  font-size: .85rem;
+  line-height: 1.75;
+  color: #3d4a6a;
+  text-align: right;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.line-numbers-col span {
+  display: block;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  margin-top: 48px;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--python-yellow);
+  border-radius: 2px;
+}
+
+/***FOOTER***/
+	.footer-m365 {
+    background: linear-gradient(
+        180deg,
+        #0d1230 0%, 
+		#060a1a 100%
+    );
+    /*border-top: 1px solid #edebe9;*/
+    padding: 10px 5%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+  }
+  .footer-content{
+    max-width:900px;      /* mismo ancho que main */
+    margin:0 auto;
+    padding:10px 20px;
+}
+  .footer-m365-label {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #7fb8d9;           /* azul-gris suave, legible sobre fondo oscuro, sin competir con el título */
+    opacity: 0.85;
+    margin-bottom: 15px;
+  }
+  .footer-m365-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #eaf6ff;           /* blanco-azulado, casi blanco, para máximo contraste y jerarquía */
+    text-shadow: 0 0 12px rgba(58, 214, 245, 0.15); /* un glow cian sutil, conecta con el brillo de los logos */
+	margin-bottom: 0px;
+  }
+
+
+.footer-top-bar{
+  height:3px;
+  background:linear-gradient(90deg,#0a2e6b 0%,#1a55d6 45%,#11c9f5 100%);
+}
+
+.footer-bottom-bar{
+  height:3px;
+  background:linear-gradient(90deg,#11c9f5 0%,#1a55d6 55%,#0a2e6b 100%);
+}
+
+.footer-banner{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0px 0px;
+  padding-bottom: 10px;
+}
+.footer-logo-space{
+  /*width:55px;
+  height:65px;*/
+  display:flex;
+  flex-direction: row;   /* logo arriba, nombre abajo, en vez de lado a lado */
+  align-items:center;
+  justify-content:center;
+}
+.footer-logo-space img{
+  filter: drop-shadow(0 0 6px rgba(58, 214, 245, 0.25));
+  height: 34px;
+  width: auto;
+}
+.footer-logo-space .name{
+  font-size: 1rem;
+  font-weight:700;
+  background: linear-gradient(to right, #0a3d91, #1a6dd4, #3ad6f5);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.footer-divider{
+  width:2px;
+  height:60px;
+  background:linear-gradient(to bottom,#0a2e6b,#1a55d6,#11c9f5);
+}
+.footer-text{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap:wrap;
+}
+.footer-text .label{
+  font-size: 1rem;
+  font-weight:700;
+  padding-left: 25px;
+  color:#8fb8d9;
+}
+.footer-text .name{
+  font-size: 1rem;
+  font-weight:700;
+  /* background:linear-gradient(to right, #0a3d91, #1a6dd4); */
+  background: repeating-linear-gradient(to right, #0a3d91 0%, #1a6dd4 55%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <svg class="python-logo-svg" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="pyBlueGrad" x1="12.961%" y1="0.475%" x2="99.844%" y2="99.675%"><stop offset="0%" stop-color="#387EB8"/><stop offset="100%" stop-color="#366994"/></linearGradient>
+                    <linearGradient id="pyYellowGrad" x1="12.961%" y1="0.475%" x2="99.844%" y2="99.675%"><stop offset="0%" stop-color="#FFD43B"/><stop offset="100%" stop-color="#FFE873"/></linearGradient>
+                </defs>
+                <path d="M126.916 0C62.366 0 66.173 28.423 66.173 28.423L66.274 57.564H128.183V68.615H31.131C31.131 68.615 0.085 65.185 0.085 125.675C0.085 186.164 26.773 185.833 26.773 185.833H53.592V158.615C53.592 158.615 53.238 131.22 81.577 131.22H184.388C184.388 131.22 209.822 131.832 209.822 105.038V35.156C209.822 35.156 213.486 0 126.916 0ZM93.314 20.983C99.709 20.983 104.897 26.17 104.897 32.565C104.897 38.96 99.709 44.147 93.314 44.147C86.919 44.147 81.733 38.96 81.733 32.565C81.733 26.17 86.919 20.983 93.314 20.983Z" fill="url(#pyBlueGrad)"/>
+                <path d="M128.76 254.684C193.309 254.684 189.503 226.261 189.503 226.261L189.402 197.12H127.493V186.069H224.545C224.545 186.069 255.591 189.499 255.591 129.01C255.591 68.52 228.903 68.851 228.903 68.851H202.084V96.07C202.084 96.07 202.438 123.464 174.099 123.464H71.289C71.289 123.464 45.854 122.852 45.854 149.646V219.528C45.854 219.528 42.19 254.684 128.76 254.684ZM162.361 233.701C155.966 233.701 150.779 228.514 150.779 222.119C150.779 215.724 155.966 210.537 162.361 210.537C168.756 210.537 173.942 215.724 173.942 222.119C173.942 228.514 168.756 233.701 162.361 233.701Z" fill="url(#pyYellowGrad)"/>
+            </svg>
+        </div>
+        <h1>Programación Orientada a Objetos en <span class="blue">Python</span></h1>
+        <p class="text-center">
+			Tutorial Interactivo Completo · Aprende las <span class="yellow">Relaciones entre Clases</span>
+		</p>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="goToSection(0)">🏠 Inicio</button>
+            <button class="nav-btn" onclick="goToSection(1)">1 🧩 Composición</button>
+			<button class="nav-btn" onclick="goToSection(2)">2 🧬 Herencia</button>
+            <button class="nav-btn" onclick="goToSection(3)">3 🧑‍👦 Herencia Simple</button>
+			<button class="nav-btn" onclick="goToSection(4)">4 👨‍👩‍👧 Herencia Múltiple</button>
+            <button class="nav-btn" onclick="goToSection(5)">🎯 Comparativa</button>           
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">Sección 1 de 6</div>
+    </nav>
+
+    <main>
+		<!-- ================================================== -->
+		<!-- ===================== INICIO ===================== -->
+		<!-- ================================================== -->
+        <div class="section active" id="section-0">           			
+			<div class="section-header">
+				<div class="section-icon icon-blue">🏠</div>
+				<div class="section-header-text">
+					<h2>Relaciones Entre Clases</h2>
+					<p>Cómo se conectan las clases para colaborar y reutilizar código.</p>
+				</div>
+			</div>
+			
+			<div class="card">		
+				<h3>🔗 Relaciones entre clases</h3>
+				<p>
+					En la programación orientada a objetos, las clases rara vez existen de forma aislada. Lo más natural es que colaboren, se organicen y compartan responsabilidades entre sí. A eso se le llama <strong>relaciones entre clases</strong>, y es uno de los pilares del diseño orientado a objetos.
+				</p>
+				<p>
+					Python ofrece varios mecanismos para establecer estas relaciones. En este curso, se verán las siguientes: Composición, Herencia Simple y Herencia Múltiple.
+				</p>
+			</div>
+			
+			
+			<div class="card">		
+				<h3>¿Por qué importan las relaciones entre clases?</h3>
+				<p>
+					Cuando un programa crece, organizar el código en clases independientes y sin relación entre sí se vuelve inviable. Las relaciones permiten:
+				</p>
+				<ul>
+					<li>
+						<strong>Reutilizar código</strong> sin duplicarlo.
+					</li>
+					<li>
+						<strong>Modelar el mundo real</strong> de forma natural (un auto <em>tiene</em> un motor, un perro <em>es un</em> animal).
+					</li>
+					<li>
+						<strong>Reducir el acoplamiento</strong>, haciendo el código más fácil de mantener y extender.
+					</li>
+				</ul>
+			</div>
+			
+			
+			<div class="card">		
+				<h3>Los tres tipos que verás en este curso:</h3>
+				<p>
+					<strong>Composición</strong> — una clase contiene instancias de otras clases como atributos. La relación se lee como <em>"tiene un"</em>: un <code>Auto</code> tiene un <code>Motor</code>. Es la forma más flexible de combinar comportamientos.
+				</p>
+				<p>
+					<strong>Herencia simple</strong> — una clase hereda atributos y métodos de una sola clase padre. La relación se lee como <em>"es un"</em>: un <code>Perro</code> es un <code>Animal</code>. Permite extender y especializar comportamientos existentes.
+				</p>
+				<p>
+					<strong>Herencia múltiple</strong> — una clase puede heredar de <em>más de una</em> clase padre simultáneamente. 
+				</p>
+				<p>
+					Cada uno de estos mecanismos tiene sus casos de uso, ventajas y consideraciones de diseño
+				</p>
+			</div>			
+            
+            <div class="nav-buttons"><button class="nav-arrow-btn" disabled>🏠 Inicio del tutorial</button><button class="nav-arrow-btn" onclick="goToSection(1)">Siguiente: Composición →</button></div>
+        </div>
+		
+		<!-- ================================================================ -->
+		<!-- ===================== SECCIÓN 1 ===================== -->
+		<!-- ================================================================ -->
+        <div class="section" id="section-1">           			
+			<div class="section-header">
+				<div class="section-icon icon-blue">📂</div>
+				<div class="section-header-text">
+					<h2>🧩 Composición</h2>
+					<p>Relación: <em>"tiene un"</em></p>
+				</div>
+			</div>
+			
+			<div class="card">		
+				<p>
+					La composición es un principio de diseño orientado a objetos donde una clase se construye <strong>incluyendo instancias de otras clases</strong> como atributos. Modela relaciones del tipo "tiene un" (<em>has-a</em>).
+				</p>
+			</div>
+			
+			<div class="card">
+				<p>
+					La composición es un principio de diseño orientado a objetos donde una clase se construye utilizando instancias de otras clases como componentes. A diferencia de la herencia, que define una relación de <strong>"es un"</strong>, la composición define una relación de <strong>"tiene un"</strong>.
+				</p>
+				<p>
+					La <strong>Composición</strong> es un principio de diseño de la Programación Orientada a Objetos (POO) donde una clase compleja se construye combinando uno o más objetos de otras clases como parte de sus atributos.
+				</p>
+				<p>
+					En lugar de heredar comportamientos de una clase padre, la clase "compuesta" delega la responsabilidad a los objetos internos que ha instanciado. Esto permite crear sistemas más flexibles, modulares y fáciles de mantener. La composición permite crear sistemas complejos combinando objetos más simples y especializados.
+				</p>
+			</div>
+			
+			
+			<div class="note-box">
+				<div class="note-title">📝 Nota:</div>
+				<p>
+					La composición favorece la <strong>reutilización de código</strong> sin crear jerarquías de herencia rígidas.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🛠️ Sintaxis:</h3>
+				<p>
+					La composición se logra simplemente instanciando las clases componentes dentro del método <code>__init__</code> de la clase contenedora o compuesta.
+				</p>
+<pre>
+<code class="language-python">class ComponenteA:
+    def método_componente_a(self):
+        # Atributos del componenteA
+		pass
+
+class ComponenteB:
+    def método_componente_b(self):
+        # Atributos del componenteB
+		pass
+
+class ComponenteN:
+    def método_componente_N(self):
+        # Atributos del componente
+		pass
+
+class Contenedor:
+    def __init__(self):
+		# Se crea la instancia de cada clase Componente dentro de Contenedor
+        self.comp_a = ComponenteA()
+        self.comp_b = ComponenteB()
+		self.comp_n = ComponenteN()
+	
+	def método_contenedor(self):
+        # Se delega la tarea a los componentes
+        self.atributo_componente.método_componente_a()
+        self.atributo_componente.método_componente_b()
+        self.atributo_componente.método_componente_n()</code>
+</pre>
+				<p>
+					La clase <code>Contenedor</code> <strong>posee</strong> instancias de <code>ComponenteA</code>, <code>ComponenteB</code> y <code>ComponenteN</code>. Son parte integral de su existencia.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔷 Composición en UML</h3>
+				<p>
+					La composición es representada con un diamante relleno (negro/sólido).
+					<br>
+					◆——————
+					<br>
+					El diamante relleno siempre va del lado del contenedor (el que posee).
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>🛠️ Sintaxis UML — Diagrama de clases:</h3>
+<pre style="text-align: center;">
+┌─────────────┐                    ┌─────────────┐
+│  Contenedor │                    │ Componente  │
+│─────────────│                    │─────────────│
+│ -componente │◆───────────────── │             │
+│─────────────│ 1               1  │─────────────│
+│             │                    │             │
+└─────────────┘                    └─────────────┘
+(todo)                             (parte)
+
+
+┌──────────────┐                    ┌─────────────────┐
+│   Automovil  │                    │ Componente      │
+│──────────────│                    │─────────────────│
+│ - marca: str │◆───────────────── │ - potencia: int │
+│──────────────│ 1               1  │─────────────────│
+│ + arrancar() │                    │ + encender()    │
+└──────────────┘                    └─────────────────┘
+</pre>
+			</div>
+			
+			<div class="card">
+				<h3 class="sub">🔢 Multiplicidad:</h3>
+				<p>
+					Los números indican cuántas instancias de cada clase participan en la relación.
+				</p>
+				<table class="comparison-table table-compact">
+					<thead>
+						<tr>
+						<th>Multiplicidad</th>
+						<th>Significado</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>◆──── 1</td>
+							<td>Exactamente uno</td>
+						</tr>
+						<tr>
+							<td>◆──── 0..1</td>
+							<td>Cero o uno (opcional)</td>
+						</tr>
+						<tr>
+							<td>◆──── 1..*</td>
+							<td>Uno o más</td>
+						</tr>
+						<tr>
+							<td>◆──── 0..*</td>
+							<td>Cero o más</td>
+						</tr>
+						<tr>
+							<td>◆──── *</td>
+							<td>Muchos</td>
+						</tr>
+						<tr>
+							<td>◆──── n</td>
+							<td>Número exacto (ej: 4)</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			
+			<div class="card">
+				<h3>📐 El Coche y el Motor:</h3>				
+<pre style="text-align: center;">
+┌──────────────────┐               ┌──────────────────┐
+│      Coche       │               │      Motor       │
+│──────────────────│               │──────────────────│
+│ -marca: str      │               │ -cilindros: int  │
+│ -modelo: str     │◆─────────────│ -combustible: str│
+│──────────────────│  1         1  │──────────────────│
+│ +arrancar()      │               │ +encender()      │
+│ +detener()       │               │ +apagar()        │
+└──────────────────┘               └──────────────────┘
+</pre>
+					
+				
+				
+				<table class="comparison-table table-compact">
+					<thead>
+						<tr>
+						<th>Lado</th>
+						<th>Número</th>
+						<th>Significado</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Coche (◆)</td>
+							<td style="text-align: center;">1</td>
+							<td>Un <code>Coche</code> posee exactamente <strong>un</strong> <code>Motor</code></td>
+						</tr>
+						<tr>
+							<td>Motor </td>
+							<td style="text-align: center;">1</td>
+							<td>Un <code>Motor</code> pertenece a exactamente <strong>un</strong> <code>Coche</code></td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<h3 class="sub">💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Motor:
+    def __init__(self, cilindros: int, combustible: str):
+        self.cilindros = cilindros
+        self.combustible = combustible
+
+    def encender(self) -> str:
+        return f"Motor de {self.cilindros} cilindros encendido ({self.combustible})"
+
+    def apagar(self) -> str:
+        return "Motor apagado"
+
+
+class Coche:
+    def __init__(self, marca: str, modelo: str):
+        self.marca = marca
+        self.modelo = modelo
+		# Aquí ocurre la composición: el Coche "tiene un" Motor
+        self.motor = Motor(4, "gasolina")
+
+    def arrancar(self) -> str:
+		# Delegación de comportamiento con self.motor.encender()
+        return f"{self.marca} {self.modelo}: {self.motor.encender()}"
+
+    def detener(self) -> str:
+		# Delegación de comportamiento con self..motor.apagar()
+        return f"{self.marca} {self.modelo}: {self.motor.apagar()}"
+
+
+mi_coche = Coche("Toyota", "Corolla")
+print(mi_coche.arrancar())   
+print(mi_coche.detener())</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Toyota Corolla: Motor de 4 cilindros encendido (gasolina)
+Toyota Corolla: Motor apagado
+</pre>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="tip-box">
+				<div class="tip-title">💡 Tip:</div>
+				<p>
+					Si el <code>Coche</code> se destruye, el <code>Motor</code> también desaparece. Eso es <strong>composición fuerte</strong> (el ciclo de vida del componente depende del contenedor).
+				</p>
+			</div>
+			
+			
+			<div class="tip-box">
+				<div class="tip-title">💡 Tip:</div>
+				<p>
+					La composición permite cambiar el componente en tiempo de ejecución. Podrías cambiar el objeto <code>self.motor</code> por un <code>MotorElectrico</code> sin necesidad de cambiar toda la jerarquía de la clase <code>Coche</code>.
+				</p>
+			</div>
+						
+			
+			<div class="card">
+				<h3>Composición con múltiples componentes</h3>
+				<p>Una clase puede componer varios objetos de distintos tipos simultáneamente.</p>
+				<h3 class="sub">💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class CPU:
+    def __init__(self, marca: str, nucleos: int):
+        self.marca = marca
+        self.nucleos = nucleos
+
+    def procesar(self) -> str:
+        return f"CPU {self.marca} ({self.nucleos} núcleos) procesando"
+
+
+class RAM:
+    def __init__(self, capacidad_gb: int):
+        self.capacidad_gb = capacidad_gb
+
+    def estado(self) -> str:
+        return f"RAM {self.capacidad_gb}GB activa"
+
+
+class Disco:
+    def __init__(self, capacidad_tb: float, tipo: str):
+        self.capacidad_tb = capacidad_tb
+        self.tipo = tipo
+
+    def estado(self) -> str:
+        return f"Disco {self.tipo} {self.capacidad_tb}TB montado"
+
+
+class Computadora:
+    def __init__(self, nombre: str):
+        self.nombre = nombre
+        self.cpu   = CPU("Intel", 8)
+        self.ram   = RAM(16)
+        self.disco = Disco(1.0, "SSD")
+
+    def reporte(self) -> str:
+        lineas = [
+            f"=== {self.nombre} ===",
+            self.cpu.procesar(),
+            self.ram.estado(),
+            self.disco.estado(),
+        ]
+        return "\n".join(lineas)
+
+
+pc = Computadora("WorkStation-01")
+print(pc.reporte())</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+=== WorkStation-01 ===
+CPU Intel (8 núcleos) procesando
+RAM 16GB activa
+Disco SSD 1.0TB montado
+</pre>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="card">
+				<h3>Composición dinámica en tiempo de ejecución</h3>
+				<p>Los componentes pueden <strong>intercambiarse en tiempo de ejecución (runtime)</strong>.</p>
+				<h3 class="sub">💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Arma:
+    def __init__(self, nombre: str, daño: int):
+        self.nombre = nombre
+        self.daño = daño
+
+    def atacar(self) -> str:
+        return f"Ataca con {self.nombre} causando {self.daño} de daño"
+
+
+class Personaje:
+    def __init__(self, nombre: str):
+        self.nombre = nombre
+        self.arma = Arma("Puños", 5)
+
+    def forjar_arma(self, nombre: str, daño: int) -> None:
+        # El Personaje crea la nueva Arma
+        self.arma = Arma(nombre, daño)
+        print(f"{self.nombre} forja: {self.arma.nombre}")
+
+    def atacar(self) -> str:
+        return f"{self.nombre}: {self.arma.atacar()}"
+
+
+heroe = Personaje("Arthas")
+print(heroe.atacar())
+
+heroe.forjar_arma("Cuchillo", 50)
+print(heroe.atacar())
+
+heroe.forjar_arma("Espada", 80)
+print(heroe.atacar())</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Arthas: Ataca con Puños causando 5 de daño
+Arthas forja: Cuchillo
+Arthas: Ataca con Cuchillo causando 50 de daño
+Arthas forja: Espada
+Arthas: Ataca con Espada causando 80 de daño
+</pre>
+					</div>
+				</div>
+			</div>
+			
+			
+            
+            <div class="nav-buttons"><button class="nav-arrow-btn" onclick="goToSection(0)">← Anterior</button><button class="nav-arrow-btn" onclick="goToSection(2)">Siguiente: Herencia →</button></div>
+        </div>
+
+		<!-- ===================================================================== -->
+		<!-- ========================= SECCIÓN 2 ========================= -->
+		<!-- ===================================================================== -->
+        <div class="section" id="section-2">
+			<div class="section-header">
+				<div class="section-icon icon-blue">🧬</div>
+				<div class="section-header-text">
+					<h2>Herencia</h2>
+					<p>Relación <em>"es un"</em></p>
+				</div>
+			</div>
+			
+			<div class="card">		
+				<p>
+					La herencia es uno de los pilares fundamentales de la programación orientada a objetos. La idea central es sencilla: <strong>una clase puede adquirir los atributos y métodos de otra clase</strong>, evitando repetir código y permitiendo construir jerarquías lógicas entre conceptos.			
+				</p>
+				<p>
+					La relación se lee siempre como <strong>"es un"</strong>: un <code>Perro</code> <em>es un</em> <code>Animal</code>, un <code>Empleado</code> <em>es una</em> <code>Persona</code>. Si esa frase tiene sentido, la herencia probablemente es la herramienta correcta.
+				</p>
+			</div>
+			
+						
+			<div class="nav-buttons"><button class="nav-arrow-btn" onclick="goToSection(1)">← Anterior</button><button class="nav-arrow-btn" onclick="goToSection(3)">Siguiente: Herenica Simple →</button></div>
+		</div>
+		
+		<!-- ======================================================== -->
+		<!-- ===================== SECCIÓN 3 ===================== -->
+		<!-- ======================================================== -->
+		<div class="section" id="section-3">
+			<div class="section-header">
+				<div class="section-icon icon-blue">🧑‍👦</div>
+				<div class="section-header-text">
+					<h2>Herencia Simple</h2>
+					<p>Una clase deriva de otra.</p>
+				</div>
+			</div>
+			
+			<div class="card">		
+				<p>
+					La herencia simple es uno de los pilares fundamentales de la Programación Orientada a Objetos (POO). Permite crear una nueva clase a partir de una clase ya existente, heredando sus atributos y métodos.	
+				</p>
+				<p>
+					La clase existente se denomina clases base ( o clase padre o superclase) y la  nueva clases se denomina clase derivada (o clase hija o subclase).
+				</p>
+				<p>
+					Cuando hablamos de Herencia Simple, nos referimos específicamente a que la clase hija solo puede heredar de una única clase padre.
+				</p>
+				<p>
+					La Herencia Simple es un principio de la Programación Orientada a Objetos (POO) que permite que una clase nueva (denominada clase hija o subclase) derive sus atributos y métodos de una clase ya existente (denominada clase padre o superclase).
+					<br>
+					En términos sencillos, la clase hija "hereda" todo el comportamiento de la clase padre, permitiendo extender su funcionalidad o modificarla sin tener que reescribir el código.
+				</p>
+			</div>
+			
+			
+			<div class="card">		
+				<p>
+					La herencia simple se basa en la relación "es un". Por ejemplo: un Perro es un Animal.
+				</p>
+				<ul>
+					<li>
+						<strong>Clase Base:</strong> Es la clase original que contiene la lógica general.
+					</li>
+					<li>
+						<strong>Clase Derivada:</strong> Es la clase que hereda de la clase base y puede añadir sus propias características únicas.
+					</li>
+				</ul>
+			</div>
+			
+			
+			<div class="card">		
+				<h3>🛠️ Sintaxis básica:</h3>
+<pre>
+<code class="language-python"># Definición de la Clase Padre
+class ClasePadre:
+    # atributos y métodos del padre
+    pass
+
+# Definición de la Clase Hija (Hereda de ClasePadre)
+class ClaseHija(ClasePadre):
+    # Atributos y métodos adicionales o sobreescritos
+    pass</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔷 Herencia Simple en UML</h3>
+				<p>
+					En UML la herencia se llama generalización y se representa con:
+				</p>
+				<ul>
+					<li>Una <strong>línea continua</strong> que une la clase hija con la clase padre.</li>
+					<li>Un <strong>triángulo vacío</strong> (<strong>sin relleno</strong>) en el extremo de la clase padre.</li>
+				</ul>
+				<p>
+					◁——————
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>🛠️ Sintaxis UML — Diagrama de clases:</h3>
+<pre style="text-align:center;">
+┌───────────────┐
+│ ClasePadre    │
+├───────────────┤
+│ atributos     │
+├───────────────┤
+│ métodos()     │
+└───────────────┘
+△
+│
+│ 
+│
+┌───────────────┐
+│ ClaseHija     │
+├───────────────┤
+│ atributos     │
+├───────────────┤
+│ métodos()     │
+└───────────────┘
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>📐 Animal y Perro:</h3>
+<pre style="text-align:center;">
+┌──────────────────────┐
+│       Animal         │
+├──────────────────────┤
+│ + nombre             │
+├──────────────────────┤
+│ + __init__(nombre)   │
+│ + comer()            │
+└──────────────────────┘
+△
+│
+│
+┌──────────────────────┐
+│        Perro         │
+├──────────────────────┤
+│                      │
+├──────────────────────┤
+│ + ladrar()           │
+└──────────────────────┘
+</pre>
+				<br>	
+				<h3 class="sub">💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python"># Clase Padre
+class Animal:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def comer(self):
+        return f"{self.nombre} está comiendo."
+
+# Clase Hija (Hereda de Animal)
+class Perro(Animal):
+    def ladrar(self):
+        return f"{self.nombre} dice: ¡Guau!"
+
+# --- Uso del código ---
+# Instanciamos la clase hija
+mi_perro = Perro("Toby")
+
+# Accedemos a un método heredado de la clase Padre
+print(mi_perro.comer())  # Salida: Toby está comiendo.
+
+# Accedemos a un método propio de la clase Hija
+print(mi_perro.ladrar()) # Salida: Toby dice: ¡Guau!</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Toby está comiendo.
+Toby dice: ¡Guau!
+</pre>
+					</div>
+				</div>
+				<p>
+					<code>Perro</code> no tiene el método <code>comer()</code>, pero lo puede usar porque lo heredó automáticamente de <code>Animal</code>
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>🔍 Verificar herencia</h3>
+				<p>
+					Dos funciones útiles para inspeccionar la jerarquía:
+				</p>
+<pre>
+<code class="language-python">print(isinstance(mi_perro, Perro))     # True → mi_perro es instancia de Perro
+print(isinstance(mi_perro, Animal))    # True → mi_perro también es instancia de Animal
+print(issubclass(Perro, Animal))  # True → Perro es subclase de Animal</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>📌 <code>super()</code> — Acceder al padre</h3>
+				<p>
+					<code>super()</code> es una función integrada (built-in) que permite llamar a métodos definidos en una clase padre desde una clase hija, especialmente útil en <code>__init__</code>.
+				</p>
+				<p>
+					A menudo, la clase hija no solo quiere usar lo de la clase padre, sino que necesita sus propios atributos en (<code>__init__</code>). Para evitar reescribir el código del padre, usamos la función <code>super()</code>.
+				</p>
+				<br>
+				<h3 class="sub">Sintaxis con <code>super()</code>:</h3>
+<pre>
+<code class="language-python">class Hijo(Padre):
+    def __init__(self, atributo_padre, atributo_hijo):
+        super().__init__(atributo_padre)   # Llama al inicializador del padre
+        self.atributo_hijo = atributo_hijo # Atributo propio</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Animal:
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+
+class Gato(Animal):
+    def __init__(self, nombre, edad, color):
+	    # Inicializamos los atributos de la clase padre
+        super().__init__(nombre, edad)   # inicializa nombre y edad desde Animal
+		# Añadimos el atributo específico de la clase hija
+        self.color = color               # atributo propio de Gato
+
+misifus = Gato("Misifús", 3, "gris")
+print(misifus.nombre)   
+print(misifus.edad)     
+print(misifus.color)</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Misifús
+3
+gris
+</pre>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="warning-box">
+				<div class="warning-title">⚠️ Precaución:</div>
+				<p>
+					Si la clase hija define <code>__init__</code> sin llamar a <code>super()</code>. <code>__init__()</code>, los atributos del padre no se inicializan y obtendrás un <code>AttributeError</code> al intentar acceder a ellos.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>✏️ Sobreescritura de métodos (<em>Overriding</em>)</h3>
+				<p>
+					La <strong>sobreescritura</strong> ocurre cuando una clase hija define un método con el mismo nombre que uno de su clase padre, pero con una implementación distinta. Al llamar al método sobre un objeto de la clase hija, Python ejecuta la versión de la hija, no la del padre.
+					<br><br>
+					Esto permite que las clases hijas <strong>especialicen o adapten</strong> el comportamiento heredado.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🛠️ Sintaxis básica: </h3>
+<pre>
+<code class="language-python">class Padre:
+    def metodo(self):
+        print("Método de la clase Padre")
+
+
+class Hija(Padre):          # Herencia simple: una sola clase padre
+    def metodo(self):       # Mismo nombre → sobreescritura
+        print("Método de la clase Hija")
+
+
+obj = Hija()
+obj.metodo()   # Salida: Método de la clase Hija</code>
+</pre>
+					<p>
+						Python busca el método primero en la clase del objeto (<code>Hija</code>). Si lo encuentra, lo usa; si no, sube a la clase padre.
+					</p>
+			</div>
+			
+			
+			
+			<div class="card">
+				<h3>💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Animal:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def hablar(self):
+        print(f"{self.nombre} hace un sonido")
+
+    def presentarse(self):
+        print(f"Soy {self.nombre}")
+
+
+class Perro(Animal):
+    def hablar(self):                  # Sobreescribe hablar()
+        print(f"{self.nombre} dice: ¡Guau!")
+
+
+class Gato(Animal):
+    def hablar(self):                  # Sobreescribe hablar()
+        print(f"{self.nombre} dice: ¡Miau!")
+
+
+animales = [Animal("Genérico"), Perro("Rex"), Gato("Michi")]
+
+for a in animales:
+    a.hablar()
+    a.presentarse()   # No fue sobreescrito: usa el del padre</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Genérico hace un sonido
+Soy Genérico
+Rex dice: ¡Guau!
+Soy Rex
+Michi dice: ¡Miau!
+Soy Michi
+</pre>
+					</div>
+				</div>
+				<p>
+					Observa que <code>presentarse()</code> no se sobreescribió, así que se hereda tal cual.
+				</p>
+			</div>
+			
+			
+			<div class="tip-box">
+				<div class="tip-title">💡Tip:</div>
+				<p>
+					Puedes sobreescribir y reutilizar el comportamiento original del padre combinando la sobreescritura con <code>super()</code>:
+				</p>
+<pre>
+<code class="language-python">class Perro(Animal):
+    def hablar(self):
+        super().hablar()        # ejecuta el método del padre primero
+        print("¡Guau también!")</code>
+</pre>			
+
+				<div class="output-body">
+<pre>
+...
+¡Guau también!
+</pre>
+				</div>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🪗 Extender en lugar de reemplazar</h3>
+				<p>
+					Muchas veces no quieres descartar por completo el comportamiento del padre, sino <strong>ampliarlo</strong>. Para eso se usa <code>super()</code>, que da acceso a los métodos de la clase padre.
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Empleado:
+    def __init__(self, nombre, salario):
+        self.nombre = nombre
+        self.salario = salario
+
+    def descripcion(self):
+        return f"{self.nombre} gana ${self.salario}"
+
+
+class Gerente(Empleado):
+    def __init__(self, nombre, salario, departamento):
+        super().__init__(nombre, salario)     # Reutiliza el __init__ del padre
+        self.departamento = departamento
+
+    def descripcion(self):
+        base = super().descripcion()          # Llama a la versión del padre
+        return f"{base} y dirige {self.departamento}"
+
+
+g = Gerente("Ana", 5000, "Ventas")
+print(g.descripcion())</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Ana gana $5000 y dirige Ventas
+</pre>
+					</div>
+				</div>
+				<p>
+					Nota que <code>__init__</code> también es un método y se puede sobreescribir; es el caso más común.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔑 Puntos importantes:</h3>
+				<ol style="padding-left: 45px;">
+					
+					<li><strong>Mismo nombre</strong>: Python no distingue por tipo ni cantidad de parámetros. Solo importa el nombre del método.</li>
+					<li><strong>Firma compatible</strong>: aunque Python no lo exige, es buena práctica mantener los mismos parámetros que el método original, para que el objeto hijo pueda usarse donde se espera el padre.</li>
+					<li><code>super()</code>: úsalo para reutilizar la lógica del padre y no duplicar código.</li>
+					<li><strong>Polimorfismo</strong>: la sobreescritura es la base del polimorfismo, ya que puedes llamar al mismo método sobre objetos de distintas clases y cada uno responde a su manera (como en el ciclo de animales).</li>
+					<li><strong>Llamada explícita alternativa</strong>: también puedes invocar al padre con <code>Padre.método(self)</code>, pero <code>super()</code> es la forma recomendada.</li>
+				</ol>
+			</div>
+			
+			
+			<div class="note-box">
+				<div class="note-title">📝 Nota: Sobreescritura vs. sobrecarga</div>
+				<p>
+					Python no soporta sobrecarga tradicional (varios métodos con el mismo nombre y distinta firma en la misma clase). Si defines dos métodos con el mismo nombre en una clase, el último reemplaza al anterior. La sobreescritura, en cambio, es entre clase padre e hija.
+				</p>
+			</div>
+			
+			
+			
+			<div class="card">
+				<h3>♿ Accesibilidad de atributos</h3>
+				<p>
+					En Python <strong>no existen modificadores de acceso estrictos</strong> (como <code>private</code> o <code>protected</code> en Java o C++). En su lugar se usan <strong>convenciones de nombres</strong> y un mecanismo llamado <em>name mangling</em>. La herencia simple es cuando una clase hija hereda de una sola clase padre.
+				</p>
+			</div>
+			
+			
+			
+			<div class="card">
+				<h3>🟢 / 🟡 / 🔴 Los tres niveles de accesibilidad</h3>
+				<table class="comparison-table table-compact">
+				  <thead>
+					<tr>
+					  <th>Tipo</th>
+					  <th>Sintaxis</th>
+					  <th>¿Accesible?</th>
+					  <th>¿Heredado?</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<tr>
+					  <td>Público</td>
+					  <td><code>self.nombre</code></td>
+					  <td>Sí</td>
+					  <td>Sí</td>
+					</tr>
+					<tr>
+					  <td>"Protegido"<br>(convención)</td>
+					  <td><code>self._nombre</code></td>
+					  <td>Técnicamente sí, pero no se debe</td>
+					  <td>Sí</td>
+					</tr>
+					<tr>
+					  <td>"Privado"<br>(name mangling)</td>
+					  <td><code>self.__nombre</code></td>
+					  <td>Sí</td>
+					  <td>No directamente</td>
+					</tr>
+				  </tbody>
+				</table>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🟢 Atributos públicos</h3>
+				<p>
+					Se heredan y se pueden usar libremente en la clase hija y desde fuera.
+				</p>
+				
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Animal:
+    def __init__(self, nombre):
+        self.nombre = nombre          # público
+
+class Perro(Animal):
+    def ladrar(self):
+        return f"{self.nombre} dice: ¡Guau!"
+
+p = Perro("Rex")
+print(p.nombre)    # Rex
+print(p.ladrar())  # Rex dice: ¡Guau!</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🟡 Atributos "protegidos" (un guion bajo)</h3>
+				<p>
+					El guion bajo simple es solo una <strong>convención</strong>: indica "uso interno, pensado para la clase y sus subclases". Python no lo impide.
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Animal:
+    def __init__(self, edad):
+        self._edad = edad             # protegido por convención
+
+class Perro(Animal):
+    def cumpleaños(self):
+        self._edad += 1               # correcto: la subclase sí puede usarlo
+        return self._edad
+
+p = Perro(3)
+print(p.cumpleaños())  # 4
+print(p._edad)         # 4 -> funciona, pero se considera mala práctica</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔴 Atributos "privados" (dos guiones bajos)</h3>
+				<p>
+					Python aplica <strong>name mangling</strong>: renombra internamente <code>__atributo</code> a <code>_NombreClase__atributo</code>. Esto hace que la subclase no lo encuentre con su nombre original.
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Animal:
+    def __init__(self, secreto):
+        self.__secreto = secreto      # se convierte en _Animal__secreto
+
+    def revelar(self):
+        return self.__secreto         # dentro de Animal funciona
+
+class Perro(Animal):
+    def intentar_acceder(self):
+        return self.__secreto         # busca _Perro__secreto -> no existe
+
+perro = Perro("hueso enterrado")
+print(perro.revelar())                # hueso enterrado (vía método de la clase padre)
+
+# print(perro.intentar_acceder())     # return self.__secreto         # busca _Perro__secreto -> no existe
+
+# print(perro.__secreto)              # AttributeError: 'Perro' object has no attribute '_Perro__secreto'</code>
+</pre>
+				<br>
+				<p>
+					<strong>¿Es realmente privado?</strong>
+					<br>
+					No. Es una protección contra colisiones de nombres, no seguridad real:
+				<p>
+			</div>
+			
+			
+			<div class="warning-box">
+				<div class="warning-title">⚠️ Precaución:</div>
+				<p>
+					Acceder a <code>_Padre__atributo</code> desde la hija es técnicamente posible pero rompe el encapsulamiento intencionado por el diseñador de la clase padre. Evítalo.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🤔 ¿Para qué sirve el name mangling?</h3>
+				<p>
+					Evita que una subclase <strong>sobrescriba por accidente</strong> un atributo de la clase padre:
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Base:
+    def __init__(self):
+        self.__valor = "de Base"
+    def mostrar_base(self):
+        return self.__valor
+
+class Hija(Base):
+    def __init__(self):
+        super().__init__()
+        self.__valor = "de Hija"     # es otro atributo: _Hija__valor
+    def mostrar_hija(self):
+        return self.__valor
+
+h = Hija()
+print(h.mostrar_base())  # de Base
+print(h.mostrar_hija())  # de Hija
+print(h.__dict__)        # {'_Base__valor': 'de Base', '_Hija__valor': 'de Hija'}</code>
+</pre>
+				<br>
+				<p>
+					Coexisten los dos atributos sin pisarse. Con un atributo público o protegido, la hija habría sobrescrito el valor de la base.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>⚔️ Atributos de clase vs. atributos de instancia</h3>
+				<p>
+					Las mismas reglas de acceso aplican a atributos de clase, que además son compartidos:
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Vehiculo:
+    ruedas = 4            # público
+    _marca = "Genérica"   # protegido
+    __serie = "X123"      # privado
+
+class Coche(Vehiculo):
+    def info(self):
+        return self.ruedas, self._marca
+
+c = Coche()
+print(c.info())                  # (4, 'Genérica')
+print(Vehiculo._Vehiculo__serie) # X123 (por mangling)</code>
+</pre>
+				<br>
+				<p>
+					Coexisten los dos atributos sin pisarse. Con un atributo público o protegido, la hija habría sobrescrito el valor de la base.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>✨ Buena práctica: usar propiedades</h3>
+				<p>
+					Para controlar el acceso de forma más seria, se usa <code>@property</code>:
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class Cuenta:
+    def __init__(self, saldo):
+        self._saldo = saldo
+
+    @property
+    def saldo(self):             # solo lectura
+        return self._saldo
+
+class CuentaAhorro(Cuenta):
+    def agregar_interes(self):
+        self._saldo *= 1.05
+
+c = CuentaAhorro(1000)
+c.agregar_interes()
+print(c.saldo)       # 1050.0
+# c.saldo = 5        # AttributeError: no tiene setter</code>
+</pre>
+				<br>
+				<p>
+					Coexisten los dos atributos sin pisarse. Con un atributo público o protegido, la hija habría sobrescrito el valor de la base.
+				</p>
+			</div>	
+			
+			
+			<div class="card">
+				<h3>✅ Buenas prácticas</h3>
+				<ul>
+					<li>
+						Usa herencia cuando la relación es <strong>"es un/a"</strong> (Perro <strong>es un</strong> Animal). Si la relación es <strong>"tiene un/a"</strong>, usa composición.
+					</li>
+					<li>
+						Llama siempre a <code>super().__init__()</code> en el <code>__init__</code> de la hija para no romper la cadena de inicialización.
+					</li>
+					<li>
+						Para extender el comportamiento del padre, sobreescribe sus métodos y llama a <code>super()</code>. Evita modificar directamente sus atributos: si el padre cambia su implementación, tu clase hija dejaría de funcionar.
+					</li>
+					<li>
+						No abuses de las cadenas de herencia muy profundas (más de 3 niveles suele ser señal de diseño complejo).
+					</li>
+				</ul>
+			</div>
+			
+				
+			<div class="nav-buttons"><button class="nav-arrow-btn" onclick="goToSection(2)">← Anterior</button><button class="nav-arrow-btn" onclick="goToSection(4)">Siguiente: Herencia Múltiple →</button></div>
+		</div>
+		
+		
+		<!-- ======================================================== -->
+		<!-- ===================== SECCIÓN 4 ===================== -->
+		<!-- ======================================================== -->
+		<div class="section" id="section-4">
+			<div class="section-header">
+				<div class="section-icon icon-blue">👨‍👩‍👧</div>
+				<div class="section-header-text">
+					<h2>Herencia Múltiple</h2>
+					<p>Una clase deriva de varias</p>
+				</div>
+			</div>
+			
+			<div class="card">		
+				<p>
+					La <strong>herencia múltiple</strong> es una característica de la programación orientada a objetos (POO) donde una clase hija o derivada puede heredar atributos y métodos de <strong>más de una clase padre</strong>.
+				</p>
+				<p>
+					Esto permite reutilizar código de diferentes fuentes y combinar comportamientos. Sin embargo, introduce complejidad, especialmente cuando dos o más superclases tienen métodos con el mismo nombre. Python resuelve esto de manera determinista utilizando el <strong>MRO (Method Resolution Order)</strong>.
+				</p>
+			</div>
+			
+			
+			<div class="card">		
+				<h3>🛠️ Sintaxis básica:</h3>
+				<p>
+					Para indicar que una clase hereda de múltiples padres, simplemente se listan los padres entre paréntesis después del nombre de la clase hija, separadas por comas.
+				</p>
+<pre>
+<code class="language-python">class ClasePadre1:
+    # Atributos y métodos de la primera clase
+    pass
+
+class ClasePadre2:
+    # Atributos y métodos de la segunda clase
+    pass
+
+class ClaseHija(ClasePadre1, ClasePadre2):
+    # Hereda de Padre1 y Padre2
+    pass</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔷 Herencia Múltiple en UML</h3>
+				<p>
+					La notación es la misma que en la herencia simple: generalización (línea continua con triángulo hueco △ en el extremo del padre). La diferencia es que la clase hija tiene dos o más flechas, una hacia cada clase padre.
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>🛠️ Sintaxis UML — Diagrama de clases:</h3>
+<pre style="text-align:center;">
+┌───────────────┐        ┌───────────────┐
+│ ClasePadre1   │        │ ClasePadre2   │
+├───────────────┤        ├───────────────┤
+│ atributos     │        │ atributos     │
+├───────────────┤        ├───────────────┤
+│ métodos()     │        │ métodos()     │
+└───────────────┘        └───────────────┘
+△                        △
+│                        │
+└───────────┬────────────┘
+│
+│
+│
+┌───────────────┐
+│ ClaseHija     │
+├───────────────┤
+│ atributos     │
+├───────────────┤
+│ métodos()     │
+└───────────────┘
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>📐 Clase Pato:</h3>
+<pre style="text-align:center;">
+┌───────────────────┐        ┌───────────────────┐
+│     Volador       │        │     Nadador       │
+├───────────────────┤        ├───────────────────┤
+│                   │        │                   │
+├───────────────────┤        ├───────────────────┤
+│ + volar()         │        │ + nadar()         │
+└───────────────────┘        └───────────────────┘
+△                            △
+│                            │
+└─────────────┬──────────────┘
+│
+┌───────────────────┐
+│       Pato        │
+├───────────────────┤
+│                   │
+├───────────────────┤
+│ + graznar()       │
+└───────────────────┘
+</pre>
+				<h3 class="sub">💻 Ejemplo:</h3>
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Volador:
+    def volar(self):
+        return "Estoy volando."
+
+class Nadador:
+    def nadar(self):
+        return "Estoy nadando."
+
+# Clase hija que hereda de ambas
+class Pato(Volador, Nadador):
+    def graznar(self):
+        return "¡Cuac, cuac!"
+
+# Instanciación y uso
+mi_pato = Pato()
+print(mi_pato.volar())   # Heredado por Volador
+print(mi_pato.nadar())   # Heredado por Nadador
+print(mi_pato.graznar()) # Método propio</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre>
+Estoy volando.
+Estoy nadando.
+¡Cuac, cuac!
+</pre>
+					</div>
+				</div>
+				<p>
+					<code>Pato</code> obtiene las capacidades de ambas clases sin repetir código.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🌿 Orden de Resolución de Métodos:</h3>
+				<p>
+					Si dos padres tienen un método con el mismo nombre, Python necesita decidir cuál usar. Para eso existe el <strong>MRO</strong> (<em>Method Resolution Order</em>, Orden de Resolución de Métodos).
+				</p>
+				<h3>💻 Ejemplo:</h3>
+<pre>
+<code class="language-python">class A:
+    def saludar(self):
+        print("Hola desde A")
+
+class B:
+    def saludar(self):
+        print("Hola desde B")
+
+class C(A, B):
+    pass
+
+C().saludar()  # Hola desde A</code>
+</pre>
+				<br>
+				<p>
+					Python busca de izquierda a derecha en la lista de padres, así que gana <code>A</code>. Puedes ver el orden completo así:
+				</p>
+<pre>
+<code class="language-python">print(C.__mro__)
+(&lt;class '__main__.C'&gt;, &lt;class '__main__.A'&gt;, &lt;class '__main__.B'&gt;, &lt;class 'object'&gt;)
+
+# o también:
+print(C.mro())
+(&lt;class '__main__.C'&gt;, &lt;class '__main__.A'&gt;, &lt;class '__main__.B'&gt;, &lt;class 'object'&gt;)</code>
+</pre>
+			</div>	
+			
+			
+			<div class="note-box">
+				<div class="note-title">📝 Nota:</div>
+				<p>
+					Toda clase en Python hereda implícitamente de <code>object</code>. Por eso <code>object</code> siempre aparece al final del MRO.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🏷️ Argumentos con nombre</h3>
+				<p>
+					Un <strong>argumento por nombre</strong> (<em>keyword argument</em>) es aquel en el que, al llamar a una función, indicas <strong>explícitamente a qué parámetro corresponde</strong> cada valor, usando la forma <code>nombre=valor</code>.
+				</p>
+				<br>
+				<h3>💻️ Ejemplo: Argumentos posicionales vs por nombre</h3>
+<pre>
+<code class="language-python">def presentar(nombre, edad, ciudad):
+    print(f"{nombre}, {edad} años, de {ciudad}")
+
+# Posicionales: importa el ORDEN
+presentar("Ana", 30, "CDMX")
+
+# Por nombre: importa el NOMBRE, no el orden
+presentar(ciudad="CDMX", nombre="Ana", edad=30)</code>
+</pre>
+				<p>
+					Ambas llamadas dan el mismo resultado. Con argumentos por nombre puedes cambiar el orden libremente.
+				</p>
+			</div>
+			
+			
+			<div class="card">
+				<h3>⚙️ **kwargs </h3>
+				<p>
+					<code>**kwargs</code> permite que una función reciba <strong>cualquier cantidad de argumentos con nombre</strong> (<em>keyword arguments</em>), sin que tengas que declararlos uno por uno.
+					<br><br>
+					El nombre <code>kwargs</code> es solo una convención (<em>keyword arguments</em>). Lo que realmente importa son los <strong>dos asteriscos</strong> <code>**</code>. Podrías llamarlo <code>**opciones</code> o <code>**datos</code> y funcionaría igual.
+				</p>
+				<br>
+				<h3>💻️ Ejemplo: **kwargs</h3>
+<pre>
+<code class="language-python">def mostrar(**kwargs):
+    print(kwargs)
+
+mostrar(nombre="Ana", edad=30, ciudad="CDMX")
+# {'nombre': 'Ana', 'edad': 30, 'ciudad': 'CDMX'}</code>
+</pre>
+				<p>
+					Dentro de la función, kwargs es un diccionario normal: las claves son los nombres de los argumentos y los valores son lo que les pasaste.
+				</p>
+<pre>
+<code class="language-python">def saludar(**kwargs):
+    for clave, valor in kwargs.items():
+        print(f"{clave}: {valor}")
+
+saludar(nombre="Ana", edad=30)
+# nombre: Ana
+# edad: 30</code>
+</pre>
+			</div>
+			
+			
+			<div class="note-box">
+				<div class="note-title">📝 Nota:</div>
+				<ol style="padding-left:45px;">
+					<li>Las claves de <code>kwargs</code> siempre son <strong>strings</strong>.</li>
+					<li>Si no pasas ningún argumento con nombre, <code>kwargs</code> es un diccionario vacío (<code>{}</code>), no <code>None</code>.</li>
+					<li>No puedes repetir un argumento: si <code>nombre</code> ya se pasó como parámetro normal, pasarlo otra vez en <code>**kwargs</code> lanza <code>TypeError</code>.</li>
+				</ol>
+			</div>
+			
+			
+			<div class="card">
+				<h3>📦 Desempaquetar un diccionario</h3>
+				<p>
+					El <code>**</code> también funciona <strong>al revés</strong>: al llamar una función, desempaqueta un diccionario en argumentos con nombre.
+				</p>
+<pre>
+<code class="language-python">def presentar(nombre, edad):
+    print(f"{nombre} tiene {edad} años")
+
+datos = {"nombre": "Ana", "edad": 30}
+presentar(**datos)
+# Ana tiene 30 años</code>
+</pre>
+				<p>
+					Es equivalente a <code>presentar(nombre="Ana", edad=30)</code>.
+				</p>
+			</div>	
+			
+			
+			<div class="card">
+				<h3>⚡ <code>super()</code> en herencia múltiple</h3>
+				<p>
+					<strong>En herencia múltiple, llamar manualmente a cada padre puede ejecutar el mismo <code>__init__</code> más de una vez</strong> (o dejar clases sin inicializar). <code>super()</code> con <code>**kwargs</code> hace que cada clase se ejecute <strong>exactamente una vez</strong>, siguiendo el MRO.
+				</p>
+				<!--
+				<p>
+					Con herencia múltiple, llamar a <code>__init__</code> de cada padre manualmente puede causar ejecuciones duplicadas. Lo recomendable es usar <code>super()</code> y aceptar <code>**kwargs</code>:
+				</p>
+				-->
+				<div class="snippet">
+					<div class="snippet-bar">
+					  <div class="dots"><span></span><span></span><span></span></div>
+					  <span class="snippet-title">Python</span>
+					  <span class="snippet-tag tag-fn">ejemplo</span>
+					</div>
+					<div class="code-wrap">
+						<div class="line-numbers-col"></div>
+<pre>
+<code class="language-python">class Empleado:
+    def __init__(self, nombre, salario, **kwargs):
+        # "nombre" y "salario" se consumen aquí, en la firma.
+        # Todo lo demás (especialidad, experiencia) queda dentro de kwargs.
+        super().__init__(**kwargs)  # reenvía solo el resto a la siguiente
+		                            # clase del MRO (Tecnico)
+        self.nombre = nombre
+        self.salario = salario
+
+
+class Tecnico:
+    def __init__(self, especialidad, experiencia, **kwargs):
+        # "especialidad" y "experiencia" se consumen aquí.
+        # En este punto kwargs ya llega vacío,
+		# nombre y salario fueron consumidos por Empleado.
+        super().__init__(**kwargs)  # reenvía un diccionario vacío a object,
+		                            # que no acepta argumentos
+        self.especialidad = especialidad
+        self.experiencia = experiencia
+
+
+class EmpleadoTecnico(Empleado, Tecnico):
+    def __init__(self, **kwargs):
+        # Recibe los 4 argumentos con nombre empaquetados en kwargs:
+        # {"nombre": ..., "salario": ..., "especialidad": ..., "experiencia": ...}
+        # Solo acepta argumentos con nombre (por eso no se pueden pasar posicionales).
+        super().__init__(**kwargs)  # **kwargs desempaqueta el diccionario en
+		                            # argumentos con nombre
+
+
+# MRO: EmpleadoTecnico -> Empleado -> Tecnico -> object
+#
+# Flujo de kwargs:
+#
+# EmpleadoTecnico:
+#	recibe:
+#	  {"nombre"="Carlos Ramírez", "salario"=18000, "especialidad"="Electrónica", "experiencia"=4}
+#	consume:
+#	  No consume nada
+#	reenvía a Empleado:
+#	  {"nombre"="Carlos Ramírez", "salario"=18000, "especialidad"="Electrónica", "experiencia"=4}
+#			
+# Empleado:
+#   recibe de EmpleadoTecnico:
+#	  {"nombre"="Carlos Ramírez", "salario"=18000, "especialidad"="Electrónica", "experiencia"=4}
+#	consume:
+#	  nombre, salario
+#	reenvía a Tecnico:
+#	  {"especialidad"="Electrónica", "experiencia"=4}
+#			
+# Tecnico
+#   recibe de Empleado:
+#	  {"especialidad"="Electrónica", "experiencia"=4}
+#	consume:
+#	  especialidad y experiencia
+#	reenvía a object:
+#	  {} (vacío)
+#
+#   object:
+#	  recibe: nada (correcto)
+		
+empleado = EmpleadoTecnico(
+    nombre="Carlos Ramírez",    # los argumentos con nombre se empaquetan en kwargs
+    salario=18000,
+    especialidad="Electrónica",
+    experiencia=4)
+
+print(EmpleadoTecnico.__mro__)</code>
+</pre>
+					</div>
+					<div class="snippet-bar output-bar">
+					  <span class="snippet-tag tag-output">salida</span>
+					</div>
+
+					<div class="output-body">
+<pre style="overflow-x: auto; white-space: pre;">
+(&lt;class '__main__.EmpleadoTecnico'&gt;, &lt;class '__main__.Empleado'&gt;, &lt;class '__main__.Tecnico'&gt;, &lt;class 'object'&gt;)
+</pre>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="card">
+				<h3>⚙️ Cómo funciona: </h3>
+				<ol style="padding-left:45px;">
+					<li>El orden de resolución de métodos (MRO) de EmpleadoTecnico es:
+					    <br>
+						EmpleadoTecnico → Empleado → Tecnico → object.
+						<br>
+						Puedes verlo con <code>EmpleadoTecnico.__mro__</code>.</li>
+					<li><code>EmpleadoTecnico.__init__</code> recibe todos los argumentos en <code>kwargs</code> y los pasa con <code>super().__init__(**kwargs)</code>.</li>
+					<li><code>Empleado.__init__</code> toma <code>nombre</code> y <code>salario</code>, y el resto (especialidad, experiencia) sigue en <code>kwargs</code> hacia <code>Tecnico</code>.</li>
+					<li><code>Tecnico.__init__</code> toma <code>especialidad</code> y <code>experiencia</code>, y le pasa un <code>kwargs</code> vacío a <code>object</code>.</li>
+				</ol>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🔍 Detalle sobre <code>super()</code> y el MRO</h3>
+				<p>
+					<code>super()</code> no significa "mi clase padre", sino "la <strong>siguiente clase en el MRO</strong> del objeto real". Por eso, dentro de <code>Empleado</code>, <code>super().__init__</code> llama a <code>Tecnico.__init__</code> (no a <code>object</code>) cuando el objeto es un <code>EmpleadoTecnico</code>.
+					<br>
+					Si creas un <code>Empleado</code> solo, su MRO es <code>Empleado → object</code>, y ahí sí llama a <code>object.__init__</code>.
+				</p>
+<pre>
+<code class="language-python">Empleado.__mro__          # (Empleado, object)
+EmpleadoTecnico.__mro__   # (EmpleadoTecnico, Empleado, Tecnico, object)</code>
+</pre>
+			</div>
+			
+			
+			<div class="card">
+				<h3>🗄️ Datos sobre <code>object</code></h3>
+				<ul style="padding-left:45px;">
+					<li>
+						<code>object</code> es la raíz de toda jerarquía de clases y siempre va último en el MRO.
+					</li>
+					<li>
+						Es el destino final de la cadena de <code>super().__init__(**kwargs)</code>.
+					</li>
+					<li>
+						No acepta argumentos en <code>__init__</code>, por eso <code>kwargs</code> debe estar vacío al llegar a él.
+					</li>
+				</ul>
+			</div>
+			
+			
+			
+			
+
+			
+
+					
+			
+				
+			<div class="nav-buttons"><button class="nav-arrow-btn" onclick="goToSection(3)">← Anterior</button><button class="nav-arrow-btn" onclick="goToSection(5)">Siguiente: Comparativa →</button></div>
+		</div>
+		
+		
+		
+		<!-- ================================================================ -->
+		<!-- ===================== SECCIÓN 5 ===================== -->
+		<!-- ================================================================ -->
+        <div class="section" id="section-5">           			
+			<div class="section-header">
+				<div class="section-icon icon-blue">⚖️</div>
+				<div class="section-header-text">
+					<h2>Comparativa</h2>
+				</div>
+			</div>
+			
+			<div class="card">
+				<h3>Composición vs Herencia</h3>
+				<p>
+					Ambos mecanismos sirven para reutilizar código, pero con filosofías distintas: la herencia define lo que un objeto <strong>es</strong>, la composición define lo que un objeto <strong>tiene</strong>.
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>Ventajas y Desventajas</h3>
+				<h3 class="sub">Herencia</h3>
+				<p>
+					La gran ventaja es la reutilización automática de código y el polimorfismo natural: una subclase obtiene todo del padre sin esfuerzo adicional, y puede usarse donde se espere el tipo base. Su desventaja es el acoplamiento fuerte que genera: un cambio en la superclase puede romper todas las subclases, y las jerarquías profundas se vuelven difíciles de seguir y mantener.
+				</p>
+				<h3 class="sub">Composición</h3>
+				<p>
+					Su fortaleza está en el bajo acoplamiento y la flexibilidad: los objetos internos pueden cambiarse en tiempo de ejecución y cada clase tiene una responsabilidad clara. La contrapartida es que requiere delegar explícitamente las llamadas a los objetos contenidos, lo que puede resultar más verboso.
+				</p>
+			</div>
+			
+			<div class="card">
+				<h3>Tabla comparativa</h3>
+				<table class="comparison-table table-compact">
+				  <thead>
+					<tr>
+					  <th>Criterio</th>
+					  <th>Herencia</th>
+					  <th>Composición</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<tr>
+					  <td>Relación</td>
+					  <td>"es un"</td>
+					  <td>"tiene un"</td>
+					</tr>
+					<tr>
+					  <td>Acoplamiento</td>
+					  <td>Alto — el hijo depende del padre</td>
+					  <td>Bajo — en Python se trabaja con duck typing</td>
+					</tr>
+					<tr>
+					  <td>Flexibilidad</td>
+					  <td>Estática — fija al definir la clase</td>
+					  <td>Dinámica — cambiable en ejecución</td>
+					</tr>
+					<tr>
+					  <td>Reutilización</td>
+					  <td>Automática — el hijo hereda todo</td>
+					  <td>Explícita — hay que delegar</td>
+					</tr>
+					<tr>
+					  <td>Jerarquías</td>
+					  <td>Pueden volverse profundas y frágiles</td>
+					  <td>Se mantienen planas</td>
+					</tr>
+					<tr>
+					  <td>Riesgo principal</td>
+					  <td>Clase base frágil</td>
+					  <td>Delegación verbosa</td>
+					</tr>
+					<tr>
+					  <td>Polimorfismo</td>
+					  <td>Natural mediante sobreescritura</td>
+					  <td>Requiere diseño adicional</td>
+					</tr>
+					<tr>
+					  <td>Cuándo usarla</td>
+					  <td>Relación "es un" genuina y estable</td>
+					  <td>Reutilizar comportamiento sin identidad de tipo</td>
+					</tr>
+				  </tbody>
+				</table>
+			</div>
+			
+			
+			<div class="card">
+				El regla general del diseño orientado a objetos es: <strong>favorecer la composición sobre la herencia</strong>. No porque la herencia sea mala, sino porque la composición es más robusta por defecto, y la herencia debe reservarse para cuando la relación conceptual entre las clases lo justifica de verdad.				
+			</div>
+		
+			<div class="nav-buttons"><button class="nav-arrow-btn" onclick="goToSection(4)">← Anterior</button><button class="nav-arrow-btn" disabled>🏁 Fin del tutorial</button></div>
+		</div>
+
+    </main>
+
+    <footer class="footer-m365">
+		<div class="footer-content">
+			<div class="footer-top-bar"></div>
+			<p class="footer-m365-title">Curso Programación Orientada a Objetos en Python</p>
+			<p class="footer-m365-label">Módulo Relaciones Entre Clases</p>
+			<div class="footer-banner" >
+				<div class="footer-text">
+					<span class="label">Instructor: </span>
+					<div class="footer-logo-space">
+						<img src="imgs/LogoM.png" alt="Logo" style="height: 44px;"><span class="name">anuel</span>
+					</div>
+					<div class="footer-logo-space">
+						<img src="imgs/LogoA.png" alt="Logo" style="height: 40px;"><span class="name">lejandro</span>
+					</div>
+					<div class="footer-logo-space">
+						<img src="imgs/LogoL.png" alt="Logo"><span class="name">ópez</span>
+					</div>
+					<div class="footer-logo-space">
+						<img src="imgs/LogoZ.png" alt="Logo"><span class="name">epeda</span>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom-bar"></div>
+		</div>
+	</footer>
+
+    <script>		
+        let currentSection = 0; const totalSections = 6;
+        function goToSection(index) { if (index < 0 || index >= totalSections) return; document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); const target = document.getElementById('section-' + index); if (target) target.classList.add('active'); currentSection = index; document.querySelectorAll('.nav-btn').forEach((btn, i) => btn.classList.toggle('active', i === index)); updateProgress(); window.scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('scorePanel').style.display = index === 8 ? 'block' : 'none'; if (index === 9 && typeof _editors !== 'undefined') { setTimeout(() => { Object.values(_editors).forEach(({ cm }) => cm.refresh()); }, 50); } }
+        function updateProgress() { document.getElementById('progressFill').style.width = ((currentSection + 1) / totalSections * 100) + '%'; document.getElementById('progressText').textContent = 'Sección ' + (currentSection + 1) + ' de ' + totalSections; }
+        // ===== QUIZ =====
+        const questions = [
+          {
+            text: '¿Qué palabra clave se utiliza en Python para definir una función?',
+            code: null,
+            opts: ['function', 'def', 'fun', 'define'],
+            ans: 1,
+            exp: 'En Python las funciones se definen con la palabra clave <code>def</code>, seguida del nombre, paréntesis y dos puntos: <code>def mi_funcion():</code>'
+          },
+          {
+            text: '¿Qué devuelve una función que NO tiene instrucción <code>return</code>?',
+            code: 'def saludar():\n    print("Hola")\n\nresultado = saludar()\nprint(resultado)',
+            opts: ['0', 'False', 'None', 'Lanza un error'],
+            ans: 2,
+            exp: 'Toda función sin <code>return</code> (o con <code>return</code> vacío) devuelve <code>None</code> implícitamente.'
+          },
+          {
+            text: '¿Qué imprime este código?',
+            code: 'def potencia(base, exponente=2):\n    return base ** exponente\n\nprint(potencia(3))',
+            opts: ['9', '6', '8', 'TypeError'],
+            ans: 0,
+            exp: 'Como no se pasa el segundo argumento, se usa el valor por defecto <code>exponente=2</code>. Entonces <code>3 ** 2 = 9</code>.'
+          },
+          {
+            text: '¿Cuál de las siguientes definiciones causa un <code>SyntaxError</code>?',
+            code: null,
+            opts: [
+              'def f(a, b=10):',
+              'def f(a=5, b=10):',
+              'def f(a=5, b):',
+              'def f(a, b, c=0):'
+            ],
+            ans: 2,
+            exp: 'Los parámetros con valor por defecto siempre deben ir DESPUÉS de los parámetros sin default. Poner <code>a=5</code> antes de <code>b</code> (sin default) genera un <code>SyntaxError</code>.'
+          },
+          {
+            text: '¿Qué tipo de función es <code>cuadrado = lambda x: x ** 2</code>?',
+            code: null,
+            opts: [
+              'Una función recursiva',
+              'Una función anónima de una sola línea (lambda)',
+              'Una función con parámetros por nombre',
+              'Una función sin parámetros'
+            ],
+            ans: 1,
+            exp: 'Las funciones <code>lambda</code> son funciones anónimas (sin nombre) de una sola expresión. Son equivalentes a <code>def cuadrado(x): return x ** 2</code>.'
+          },
+          {
+            text: '¿Qué imprime este código?',
+            code: 'def menor_mayor(a, b):\n    return min(a, b), max(a, b)\n\np, q = menor_mayor(8, 3)\nprint(p, q)',
+            opts: ['8 3', '3 8', '(3, 8)', 'TypeError'],
+            ans: 1,
+            exp: '<code>return min(a,b), max(a,b)</code> devuelve una tupla <code>(3, 8)</code>. Al hacer <code>p, q = ...</code> se desempaqueta: <code>p=3</code>, <code>q=8</code>. Se imprime <code>3 8</code>.'
+          },
+          {
+            text: '¿Qué hace el símbolo <code>*</code> solo en la firma de esta función?',
+            code: 'def conectar(host, *, timeout=30):\n    pass',
+            opts: [
+              'Indica que la función acepta cualquier número de argumentos posicionales',
+              'Actúa como separador: todo lo que sigue solo puede pasarse por nombre (keyword-only)',
+              'Es un error de sintaxis',
+              'Hace que el parámetro timeout sea obligatorio'
+            ],
+            ans: 1,
+            exp: 'El <code>*</code> solo como separador indica que los parámetros que le siguen (<code>timeout</code>) son <em>keyword-only</em>: deben pasarse obligatoriamente por nombre, no por posición.'
+          },
+          {
+            text: '¿Qué imprime este código?',
+            code: 'def sumar(*nums):\n    return sum(nums)\n\nprint(sumar(1, 2, 3, 4))',
+            opts: ['[1, 2, 3, 4]', '10', '(1, 2, 3, 4)', 'Error'],
+            ans: 1,
+            exp: '<code>*nums</code> empaqueta todos los argumentos posicionales en una tupla. <code>sum((1,2,3,4))</code> devuelve <code>10</code>.'
+          },
+          {
+            text: '¿Cuál es la característica principal de una función recursiva?',
+            code: null,
+            opts: [
+              'Que no tiene parámetros',
+              'Que retorna siempre None',
+              'Que se llama a sí misma y tiene un caso base que detiene la recursión',
+              'Que solo acepta argumentos por nombre'
+            ],
+            ans: 2,
+            exp: 'Una función recursiva se llama a sí misma. La clave es tener un <strong>caso base</strong> que detenga la recursión; sin él, la función se llamaría infinitamente hasta generar un <code>RecursionError</code>.'
+          },
+          {
+            text: '¿Qué devuelve <code>divmod(17, 5)</code>?',
+            code: null,
+            opts: ['3', '2', '(3, 2)', '3.4'],
+            ans: 2,
+            exp: '<code>divmod(x, y)</code> es una función built-in que devuelve una tupla <code>(cociente, residuo)</code>. 17 ÷ 5 = 3 con residuo 2, por eso devuelve <code>(3, 2)</code>.'
+          }
+        ];
+
+        let currentQ = 0;
+        let quizScore = 0;
+        let answered = false;
+
+        function renderQuestion() {
+          const q = questions[currentQ];
+
+          // Construir el HTML de la pregunta separando texto y código
+          let questionHTML =
+            '<span style="color:var(--text-muted);font-size:0.8rem;">Pregunta ' + (currentQ+1) + ' de ' + questions.length + '</span><br><br>' +
+            '<p style="font-family:Segoe UI,Tahoma,sans-serif;font-size:1em;font-weight:600;color:var(--text-light);margin-bottom:' + (q.code ? '12px' : '0') + ';line-height:1.6;">' + q.text + '</p>';
+
+          if (q.code) {
+            questionHTML +=
+              '<pre style="font-family:Consolas,Monaco,monospace;font-size:0.88em;line-height:1.8;' +
+              'background:var(--bg-code);border:1px solid rgba(48,105,152,0.3);border-radius:8px;' +
+              'padding:12px 16px;color:var(--python-yellow);white-space:pre;overflow-x:auto;margin-top:4px;">' +
+              q.code.replace(/\\n/g, '\n') + '</pre>';
+          }
+
+          document.getElementById('quizQ').innerHTML = questionHTML;
+
+          const optsEl = document.getElementById('quizOpts');
+          optsEl.innerHTML = '';
+          q.opts.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-opt';
+            // Opciones: texto normal (sin código de bloque)
+            btn.innerHTML =
+              '<span style="color:var(--python-blue-light);font-weight:700;margin-right:10px;">' + String.fromCharCode(65+i) + '.</span>' +
+              '<span style="font-family:Segoe UI,Tahoma,sans-serif;white-space:pre-wrap;">' + opt + '</span>';
+            btn.onclick = () => answerQ(i, btn);
+            optsEl.appendChild(btn);
+          });
+          document.getElementById('quizFeedback').classList.remove('show');
+          document.getElementById('quizNext').classList.remove('show');
+          answered = false;
+        }
+
+        function answerQ(idx, btn) {
+          if (answered) return;
+          answered = true;
+          const q = questions[currentQ];
+          const allBtns = document.querySelectorAll('.quiz-opt');
+          const fb = document.getElementById('quizFeedback');
+          const nxt = document.getElementById('quizNext');
+          if (idx === q.ans) {
+            btn.classList.add('correct');
+            fb.className = 'quiz-feedback show ok';
+            fb.innerHTML = '✅ <strong>¡Correcto!</strong> ' + q.exp;
+            quizScore++;
+            document.getElementById('scoreValue').textContent = quizScore;
+          } else {
+            btn.classList.add('wrong');
+            allBtns[q.ans].classList.add('correct');
+            fb.className = 'quiz-feedback show fail';
+            fb.innerHTML = '❌ <strong>Incorrecto.</strong> ' + q.exp;
+          }
+          nxt.classList.add('show');
+          if (currentQ === questions.length - 1) { nxt.textContent = 'Ver resultado 🎉'; }
+        }
+
+        function nextQuestion() {
+          currentQ++;
+          if (currentQ >= questions.length) { showQuizResult(); } else { renderQuestion(); }
+        }
+
+        function showQuizResult() {
+          document.getElementById('quizContainer').style.display = 'none';
+          const r = document.getElementById('quizResult');
+          r.style.display = 'block';
+		  document.querySelector('#section-8 .nav-buttons .nav-arrow-btn:last-child').disabled = false;
+          const pct = Math.round((quizScore / questions.length) * 100);
+          document.getElementById('quizScore').textContent = quizScore + ' / ' + questions.length + ' (' + pct + '%)';
+          const msgs = [
+            [80, '🏆 ¡Excelente! Dominas las estructuras de iteración de Python.'],
+            [60, '👍 Bien hecho. Repasa break/continue/else para perfeccionar.'],
+            [0,  '📚 Sigue practicando. Revisa los ejemplos interactivos del tutorial.']
+          ];
+          document.getElementById('quizMsg').textContent = msgs.find(([min]) => pct >= min)[1];
+        }
+
+        function restartQuiz() {
+          currentQ = 0; quizScore = 0; answered = false;
+          document.getElementById('quizContainer').style.display = 'block';
+          document.getElementById('quizResult').style.display = 'none';
+          renderQuestion();
+        }
+		
+		/*
+		function finishTutorial() {
+          //alert('🎉 ¡Felicidades! Completaste el tutorial.\nPuntaje final: ' + quizScore + ' / ' + questions.length + '\n\nAhora pon en práctica lo aprendido en los ejercicios. ¡Éxito!');
+          goToSection(9);
+        }
+		*/
+
+        renderQuestion();
+        function runDemo1() { const edad = parseInt(document.getElementById('demo1-edad').value); const output = document.getElementById('demo1-output'); output.classList.add('has-output'); if (isNaN(edad)) { output.textContent = '⚠️ Ingresa un número válido.'; return; } output.textContent = (edad >= 18 ? 'Eres mayor de edad' : '') + '\nFin del programa'; }
+        function runDemo2() { const n = parseInt(document.getElementById('demo2-numero').value); const output = document.getElementById('demo2-output'); output.classList.add('has-output'); if (isNaN(n)) { output.textContent = '⚠️ Ingresa un número válido.'; return; } output.textContent = n + (n % 2 === 0 ? ' es par ✅' : ' es impar 🔵'); }
+        function runDemo3() { const nota = parseInt(document.getElementById('demo3-nota').value); const output = document.getElementById('demo3-output'); output.classList.add('has-output'); if (isNaN(nota) || nota < 0 || nota > 100) { output.textContent = '⚠️ Nota válida entre 0 y 100.'; return; } let r = nota >= 90 ? '🏆 Excelente - A' : nota >= 80 ? '👍 Muy bien - B' : nota >= 70 ? '📝 Bien - C' : nota >= 60 ? '⚠️ Suficiente - D' : '❌ Reprobado - F'; output.textContent = 'Nota: ' + nota + '/100\nResultado: ' + r; }
+        function runDemo4() { const a = parseFloat(document.getElementById('demo4-a').value); const b = parseFloat(document.getElementById('demo4-b').value); const output = document.getElementById('demo4-output'); output.classList.add('has-output'); if (isNaN(a) || isNaN(b)) { output.textContent = '⚠️ Ingresa números válidos.'; return; } let r = 'a = ' + a + ', b = ' + b + '\n\na > b: ' + (a>b) + '\na < b: ' + (a<b) + '\na == b: ' + (a===b) + '\na != b: ' + (a!==b) + '\n\na > 0 and b > 0: ' + (a>0&&b>0) + '\na > 0 or b > 0: ' + (a>0||b>0) + '\nnot (a > b): ' + !(a>b); output.textContent = r; }
+        function runDemo5() { const u = document.getElementById('demo5-user').value; const p = document.getElementById('demo5-pass').value; const r = document.getElementById('demo5-role').value; const output = document.getElementById('demo5-output'); output.classList.add('has-output'); if (u === 'admin' && p === '1234') { output.textContent = '✅ Login exitoso\n' + (r === 'administrador' ? '🔓 Acceso total' : r === 'editor' ? '✏️ Acceso de edición' : '👁️ Solo lectura'); } else { output.textContent = '❌ Credenciales incorrectas'; } }
+        function runDemo6() { const n = parseFloat(document.getElementById('demo6-num').value); const output = document.getElementById('demo6-output'); output.classList.add('has-output'); if (isNaN(n)) { output.textContent = '⚠️ Ingresa un número válido.'; return; } const tipo = n > 0 ? 'positivo' : n < 0 ? 'negativo' : 'cero'; const abs = n >= 0 ? n : -n; const par = n === 0 ? 'cero' : Math.abs(n) % 2 === 0 ? 'par' : 'impar'; output.textContent = 'Número: ' + n + '\nTipo: ' + tipo + '\nValor absoluto: ' + abs + '\nEs: ' + par; }
+        function runDemo7() { const dia = document.getElementById('demo7-dia').value; const output = document.getElementById('demo7-output'); output.classList.add('has-output'); let r = 'match dia:\n'; let m = ''; switch(dia) { case 'lunes': r += '    case "lunes":\n'; m = '💪 Inicio de semana'; break; case 'viernes': r += '    case "viernes":\n'; m = '🎉 ¡Casi fin de semana!'; break; case 'sábado': case 'domingo': r += '    case "sábado" | "domingo":\n'; m = '🏖️ Fin de semana'; break; default: r += '    case _:\n'; m = '📅 Día normal'; } r += '        print("' + m + '")\n\n📤 Salida:\n' + m; output.textContent = r; }
+		
+        // ===== SIMULADOR CORREGIDO CON SOPORTE PARA IF/ELIF/ELSE =====
+        function runEditor(num) {
+            const challengeBoxes = document.querySelectorAll('#section-8 .challenge-box');
+            const box = challengeBoxes[num - 1]; if (!box) return;
+            const instructionsDiv = box.querySelector('.editor-instructions');
+            const instructionsText = instructionsDiv ? instructionsDiv.innerText : '';
+            const textarea = document.getElementById('editor-' + num);
+            const fullCode = instructionsText + textarea.value;
+            const output = document.getElementById('output-' + num);
+            try { const result = simulatePython(fullCode); output.className = 'editor-output success'; output.textContent = result || '(Sin salida)'; } catch (e) { output.className = 'editor-output error'; output.textContent = '❌ Error: ' + e.message; }
+        }
+
+        function simulatePython(code) {
+            const lines = code.split('\n');
+            let output = [];
+            let variables = {};
+
+            function getIndent(line) { const m = line.match(/^(\s*)/); return m ? m[1].length : 0; }
+            function isEmpty(line) { const t = line.trim(); return t === '' || t.startsWith('#'); }
+
+            function evaluateCondition(cond) {
+                let expr = cond.trim();
+                for (let vn in variables) {
+                    const re = new RegExp('\\b' + vn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g');
+                    const val = variables[vn];
+                    if (typeof val === 'number') expr = expr.replace(re, val);
+                    else if (typeof val === 'string') expr = expr.replace(re, '"' + val.replace(/"/g, '\\"') + '"');
+                }
+                expr = expr.replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+                try { return !!Function('"use strict"; return (' + expr + ')')(); } catch(e) { return false; }
+            }
+
+            function evaluateExpression(expr) {
+                let e = expr.trim();
+                for (let vn in variables) {
+                    const re = new RegExp('\\b' + vn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g');
+                    const val = variables[vn];
+                    if (typeof val === 'number') e = e.replace(re, val);
+                    else if (typeof val === 'string') e = e.replace(re, '"' + val.replace(/"/g, '\\"') + '"');
+                }
+                e = e.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false');
+                e = e.replace(/\band\b/g, '&&').replace(/\bor\b/g, '||').replace(/\bnot\b/g, '!');
+                try { return Function('"use strict"; return (' + e + ')')(); } catch(e) { return expr; }
+            }
+
+            function processPrint(content) {
+                if (content.startsWith('f"') || content.startsWith("f'")) {
+                    let str = content.slice(2, -1);
+                    str = str.replace(/\{([^}]+)\}/g, (m, expr) => { try { return evaluateExpression(expr.trim()); } catch(e) { return m; } });
+                    output.push(str);
+                } else {
+                    if ((content.startsWith('"') && content.endsWith('"')) || (content.startsWith("'") && content.endsWith("'"))) output.push(content.slice(1, -1));
+                    else { try { output.push(String(evaluateExpression(content))); } catch(e) { output.push(content); } }
+                }
+            }
+
+            function processAssignment(line) {
+                const m = line.trim().match(/^(\w+)\s*=\s*(.+)$/);
+                if (m) {
+                    const vn = m[1]; let val = m[2].trim();
+                    if (val.startsWith('f"') || val.startsWith("f'")) {
+                        let s = val.slice(2, -1); s = s.replace(/\{([^}]+)\}/g, (mm, ex) => { try { return evaluateExpression(ex.trim()); } catch(e) { return mm; } }); variables[vn] = s;
+                    } else if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) { variables[vn] = val.slice(1, -1); }
+                    else { try { variables[vn] = evaluateExpression(val); } catch(e) { variables[vn] = val; } }
+                    return true;
+                }
+                return false;
+            }
+
+            function skipBlock(start, baseInd) {
+                let i = start;
+                while (i < lines.length) { const l = lines[i]; if (isEmpty(l)) { i++; continue; } if (getIndent(l) <= baseInd) return i; i++; }
+                return i;
+            }
+
+            function processIfChain(start, chainInd) {
+                let i = start;
+                let satisfied = false;
+                while (i < lines.length) {
+                    const line = lines[i]; if (isEmpty(line)) { i++; continue; }
+                    const ind = getIndent(line);
+                    if (ind < chainInd) break;
+                    if (ind > chainInd) { i++; continue; }
+                    const trimmed = line.trim();
+                    const ifM = trimmed.match(/^if\s+(.+):$/);
+                    const elifM = trimmed.match(/^elif\s+(.+):$/);
+                    const elseM = trimmed.match(/^else:$/);
+                    if (!ifM && !elifM && !elseM) break;
+
+                    if (!satisfied) {
+                        if (ifM && evaluateCondition(ifM[1])) { satisfied = true; i = executeBlock(i + 1, chainInd); continue; }
+                        if (elifM && evaluateCondition(elifM[1])) { satisfied = true; i = executeBlock(i + 1, chainInd); continue; }
+                        if (elseM) { satisfied = true; i = executeBlock(i + 1, chainInd); continue; }
+                    }
+                    i = skipBlock(i + 1, chainInd);
+                }
+                return i;
+            }
+
+            function executeBlock(start, baseInd) {
+                let i = start;
+                while (i < lines.length) {
+                    const line = lines[i]; if (isEmpty(line)) { i++; continue; }
+                    const ind = getIndent(line); if (ind <= baseInd) return i;
+                    const trimmed = line.trim();
+                    if (trimmed.match(/^if\s+(.+):$/)) { i = processIfChain(i, ind); continue; }
+                    const pm = trimmed.match(/^print\((.+)\)$/);
+                    if (pm) { processPrint(pm[1]); i++; continue; }
+                    if (processAssignment(trimmed)) { i++; continue; }
+                    i++;
+                }
+                return i;
+            }
+
+            executeBlock(0, -1);
+            return output.join('\n');
+        }
+
+        function toggleSolution(num) { document.getElementById('solution-' + num).classList.toggle('visible'); }
+        document.addEventListener('keydown', function(e) { if (e.target.tagName === 'TEXTAREA') { if (e.key === 'Tab') { e.preventDefault(); const s = e.target.selectionStart; e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd); e.target.selectionStart = e.target.selectionEnd = s + 4; } return; } if (e.key === 'ArrowRight' && currentSection < totalSections - 1) goToSection(currentSection + 1); else if (e.key === 'ArrowLeft' && currentSection > 0) goToSection(currentSection - 1); });
+        updateProgress();
+		
+		
+
+
+		
+		
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+  function addLineNumbers() {
+    document.querySelectorAll('.code-wrap').forEach(wrap => {
+      const code = wrap.querySelector('code');
+      const col  = wrap.querySelector('.line-numbers-col');
+      if (!code || !col) return;
+      const lines = code.textContent.split('\n');
+      const count = lines[lines.length - 1].trim() === '' ? lines.length - 1 : lines.length;
+      col.innerHTML = Array.from({ length: count }, (_, i) => `<span>${i + 1}</span>`).join('');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.Prism) Prism.hooks.add('complete', addLineNumbers);
+    setTimeout(addLineNumbers, 400);
+  });
+</script>
+</body>
+</html>
